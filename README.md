@@ -4,6 +4,8 @@ Chip *secure element* untuk autentikasi baterai kendaraan listrik di ekosistem t
 
 **Topik lomba:** 1. Secure Identity & Security Element Chip
 
+![Ilustrasi alur autentikasi baterai: chip di pack baterai, stasiun SPBKLU, dan PERURI sebagai pihak tepercaya](docs/images/ilustrasi-ide.svg)
+
 ## Ide singkat
 
 - **Kunci unik per chip dari RO-PUF.** Kunci tidak pernah disimpan di memori, jadi chip tidak bisa dikloning.
