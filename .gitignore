@@ -41,3 +41,12 @@ runs/
 # File kerja sementara Office/LibreOffice
 ~$*
 .~lock.*
+
+# LaTeX (file sementara kompilasi)
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz

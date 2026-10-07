@@ -1,11 +1,21 @@
 # proposal
 
-Draf dan versi final proposal. Wajib berurutan 5 bagian:
+Proposal lomba dalam LaTeX, mengikuti format template resmi (`template-proposal-hackathon-chip-2026.pdf`).
 
-1. Ringkasan Ide (Executive Summary)
-2. Latar Belakang & Rumusan Masalah
-3. Proposed Chip Design
-4. Referensi
-5. Lampiran (rencana bootcamp 3 hari, identitas tim, pembagian peran)
+| File | Isi |
+|---|---|
+| `main.tex` | Sumber proposal (5 bagian wajib + tim, luaran, rencana bootcamp) |
+| `main.pdf` | Hasil kompilasi |
+| `figures/` | Gambar yang dipakai di proposal |
 
-PDF final diberi nama `proposal-final.pdf`.
+## Kompilasi
+
+```bash
+cd proposal
+pdflatex main.tex
+pdflatex main.tex   # dua kali agar nomor gambar & referensi benar
+```
+
+Atau unggah folder ini ke Overleaf (compiler: pdfLaTeX).
+
+Teks berwarna **merah dalam kurung siku** di PDF adalah bagian yang masih harus diisi tim.
