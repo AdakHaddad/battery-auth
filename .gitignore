@@ -1,0 +1,40 @@
+# Windows / editor
+desktop.ini
+Thumbs.db
+.vscode/
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Simulasi (cocotb / Verilator / Icarus)
+sim_build/
+obj_dir/
+results.xml
+*.vcd
+*.fst
+*.vvp
+
+# Quartus — simpan .qpf, .qsf, .sdc, .sof final saja
+fpga/**/db/
+fpga/**/incremental_db/
+fpga/**/output_files/*
+!fpga/**/output_files/*.sof
+fpga/**/simulation/
+fpga/**/greybox_tmp/
+fpga/**/*.qws
+fpga/**/*.bak
+fpga/**/*.rpt
+fpga/**/*.summary
+fpga/**/*.smsg
+
+# Yosys / OpenROAD
+*.json.bak
+runs/
+
+# File kerja sementara Office/LibreOffice
+~$*
+.~lock.*
