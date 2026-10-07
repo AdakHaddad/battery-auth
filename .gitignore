@@ -1,3 +1,6 @@
+# Pengaturan lokal Claude Code
+.claude/settings.local.json
+
 # Windows / editor
 desktop.ini
 Thumbs.db
