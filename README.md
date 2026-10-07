@@ -24,6 +24,8 @@ Chip *secure element* untuk autentikasi baterai kendaraan listrik di ekosistem t
 | 18–20 Okt 2026 | Bootcamp Top 5 (3 hari) |
 | 21–22 Okt 2026 | Summit, presentasi final & award |
 
+Rincian tugas per tahap ada di [docs/MILESTONES.md](docs/MILESTONES.md).
+
 ## Struktur folder
 
 ```
