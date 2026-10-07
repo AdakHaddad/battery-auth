@@ -50,3 +50,6 @@ runs/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+
+# Catatan kerja pribadi (hasil council, draf sementara)
+active/
