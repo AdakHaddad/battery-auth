@@ -493,16 +493,22 @@ Ir. Agus Bejo, S.T., M.Eng., D.Eng., IPM & Dosen pembimbing & Arahan teknis dan 
 \section*{Luaran \& Demo (Opsional)}
 
 \field{Demo Live:}
-Pada DE10-Nano, dua ``baterai'' (dua lokasi PUF berbeda) diuji oleh dua stasiun emulasi yang terhubung ke satu basis data. Baterai asli diterima di kedua stasiun, kloningan ditolak, respons lama (\emph{replay}) ditolak, dan \emph{glitch} clock atau pembukaan ``casing'' membuat chip terkunci dengan indikator LED, lalu ID-nya diblokir basis data.
+Demo berjalan di DE10-Nano dengan dua ``baterai'' (dua lokasi PUF berbeda), dua stasiun emulasi, dan satu basis data identitas. Empat skenario ditunjukkan.
+\begin{itemize}
+  \item Baterai asli diterima di kedua stasiun.
+  \item Baterai kloning ditolak.
+  \item Respons lama yang dikirim ulang (\emph{replay}) ditolak.
+  \item \emph{Glitch} clock atau pembukaan ``casing'' membuat chip terkunci dengan indikator LED, lalu ID-nya diblokir basis data.
+\end{itemize}
 
 \field{Video Demo:}
-Video 3--5 menit: masalah baterai palsu, pembagian peran chip, stasiun, dan basis data, arsitektur chip, dan skenario serangan.
+Video 3--5 menit berisi masalah baterai palsu, cara kerja chip bersama stasiun dan basis data, serta keempat skenario demo. Video ini juga menjadi cadangan bila board bermasalah saat demo langsung.
 
 \field{Repository Source Code:}
-RTL Verilog, testbench cocotb, model referensi Python, emulasi stasiun dan basis data, proyek Quartus/Platform Designer, skrip karakterisasi PUF, dan bitstream (.sof/.rbf).
+RTL Verilog, \emph{testbench} cocotb, model referensi Python, emulasi stasiun dan basis data, proyek Quartus, skrip karakterisasi PUF, dan \emph{bitstream}.
 
 \field{Laporan Teknis Singkat:}
-Spesifikasi arsitektur dan register map, hasil sintesis/timing/resource/daya, statistik PUF (keunikan dan reliabilitas), latensi autentikasi, dan hasil uji serangan terhadap R1--R5.
+Hasil pengukuran terhadap target R1--R5, yaitu statistik PUF (keunikan dan reliabilitas), latensi autentikasi, hasil sintesis (sumber daya, \emph{timing}, dan daya), serta hasil uji serangan. Laporan dilengkapi spesifikasi arsitektur dan \emph{register map}.
 
 \section*{Rencana Bootcamp (3 Hari) (Opsional)}
 
