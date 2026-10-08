@@ -56,3 +56,7 @@ active/
 
 # Instruksi Claude Code (pribadi)
 CLAUDE.md
+
+# Dokumen lokal yang tidak dipublikasikan (arsip internal, dokumen milik panitia)
+docs/arsip/
+docs/panduan/
