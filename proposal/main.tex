@@ -200,7 +200,7 @@ Riwayat di basis data tersebut hanya bermakna apabila setiap baterai memiliki id
 \hline
 \hdr{Chip yang dirancang} & \emph{Secure element} tanpa memori non-volatil berisi \emph{Ring-Oscillator PUF} dengan \emph{fuzzy extractor}, HMAC-SHA-256 berbasis baseline TT07~\cite{tt07}, FSM \emph{challenge--response}, dan monitor \emph{tamper}. Target ASIC SKY130. \\ \hline
 \hdr{Target pengguna} & Operator stasiun dan penyedia sewa baterai (pemeriksa), produsen baterai dan BMS (pemasang chip), serta lembaga penjamin keaslian (pengelola basis data identitas). Adopsi dapat didorong melalui standar identitas baterai. \\ \hline
-\hdr{Dampak} & Baterai yang tidak dikenal ditolak sebelum diserahkan (keselamatan). Nilai sisa dan garansi ditentukan dari riwayat yang tepercaya (ekonomi). Akar kepercayaan dirancang di dalam negeri (kemandirian). \\ \hline
+\hdr{Dampak} & Baterai yang tidak dikenal ditolak sebelum diserahkan (keselamatan). Harga jual kembali dan garansi ditentukan dari riwayat yang tepercaya (ekonomi). Akar kepercayaan dirancang di dalam negeri (kemandirian). \\ \hline
 \hdr{Demo prototipe} & FPGA DE10-Nano. Baterai asli diterima, kloningan dan respons lama ditolak, serta pembongkaran membuat identitas diblokir. \\ \hline
 \end{tabularx}
 \end{center}
@@ -221,27 +221,29 @@ Seperti dokumen berharga, baterai tukar terus berpindah tangan. Karena itu, keas
 
 \begin{enumerate}[label=\textbf{P\arabic*.}, leftmargin=2.2em]
   \item \textbf{Keaslian baterai tidak dapat dibuktikan secara independen.} Nomor seri, label, dan kode QR mudah disalin, sedangkan autentikasi milik operator hanya berlaku di jaringannya sendiri. Pihak yang mencari keuntungan dapat menyerahkan baterai palsu di stasiun dan membawa pulang baterai asli. Operator kehilangan aset, sedangkan pengendara berikutnya menerima baterai dengan sel yang berisiko mengalami \emph{thermal runaway}.
-  \item \textbf{Riwayat baterai bergantung pada pengakuan baterai itu sendiri.} Jumlah siklus dan kondisi kesehatan dilaporkan oleh BMS (\emph{Battery Management System}), papan pengendali di dalam \emph{pack} baterai. \emph{Pack} adalah satu unit baterai yang ditukar di stasiun, berisi sel, BMS, dan casing. BMS ini dapat diprogram ulang sebelum baterai dijual kembali. Nilai sisa, klaim garansi, dan keputusan keselamatan pun didasarkan pada data yang salah. Riwayat yang benar juga tidak berguna apabila tidak terikat pada baterai fisik yang tepat.
+  \item \textbf{Riwayat baterai hanya bersumber dari data yang dilaporkan baterai itu sendiri.} Jumlah siklus dan kondisi kesehatan dilaporkan oleh BMS (\emph{Battery Management System}), papan pengendali di dalam \emph{pack} baterai, yaitu satu unit berisi sel, BMS, dan casing. BMS dapat diprogram ulang untuk memalsukan data tersebut. Padahal, harga jual kembali, klaim garansi, dan keputusan keselamatan ditentukan dari data itu.
   \item \textbf{Kepercayaan tidak berlaku lintas operator.} Operator yang bersaing cenderung tidak mempercayai basis data milik pesaingnya. Ketika baterai mulai distandarkan antaroperator, baterai yang ditolak di satu jaringan dapat beredar di jaringan lain. Pembeli baterai bekas, pihak daur ulang, dan penjamin garansi juga tidak memiliki sumber netral untuk memeriksa riwayatnya.
 \end{enumerate}
 
 \subsection{Alasan Diperlukannya Chip}
 
-Identitas baterai tidak dapat diserahkan kepada perangkat lunak. Pihak yang ingin memalsukan baterai memegang perangkatnya langsung dengan waktu tidak terbatas, sehingga pemeriksaan berbasis perangkat lunak dapat dilewati dengan memprogram ulang firmware. Kunci rahasia yang tersimpan di memori flash dapat diekstrak melalui \emph{probing} atau injeksi kesalahan (\emph{fault injection})~\cite{barel}. Kunci dari satu baterai asli tersebut kemudian dapat disalin ke banyak baterai palsu yang menggunakan identitas yang sama. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat. Kunci tidak boleh tersimpan di dalam chip~\cite{suh,maes}, perhitungan kriptografi harus terisolasi dari firmware, dan chip harus mampu merespons serangan fisik tanpa bantuan perangkat lain. Chip asli yang dipindahkan ke \emph{pack} lain atau dikabelkan ke banyak \emph{pack} palsu tetap dapat menghasilkan respons yang benar. Ruang gerak serangan tersebut dipersempit di tingkat sistem dengan mencocokkan hasil ukur sel oleh stasiun terhadap riwayat identitasnya, sehingga perubahan yang janggal dapat ditandai (Bagian~5).
+Identitas baterai tidak dapat diserahkan kepada perangkat lunak. Pemalsu memegang baterai tanpa batas waktu, sehingga firmware dapat diprogram ulang dan kunci di memori flash dapat diekstrak melalui \emph{probing} atau \emph{fault injection}~\cite{barel}. Satu kunci asli yang bocor kemudian dapat disalin ke banyak baterai palsu. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat, yaitu kunci tidak tersimpan di chip~\cite{suh,maes}, kriptografi terisolasi dari firmware, dan chip mampu merespons serangan fisik secara mandiri. Chip asli yang dipindahkan ke \emph{pack} baterai palsu tetap dapat menjawab dengan benar. Celah ini dipersempit di tingkat sistem dengan mencocokkan hasil ukur sel terhadap riwayat identitasnya.
 
 \subsection{Kesenjangan Solusi yang Tersedia}
+\newcommand{\sbg}{{\footnotesize\color{subtle}sebagian}}
 
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|*{6}{>{\centering\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{1.55cm}|}}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|*{6}{>{\centering\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}m{1.5cm}|}}
 \hline
-\hdr{Pendekatan} & \hdr{Tahan kloning} & \hdr{Tahan serangan fisik} & \hdr{Kunci tidak tersimpan di chip} & \hdr{Desain dapat diperiksa} & \hdr{Enrolment pihak tepercaya} & \hdr{Basis data lintas operator} \\ \hline
-Nomor seri, label, kode QR & \xmark & \xmark & -- & \cmark & \pmark & \pmark \\ \hline
-Kunci di firmware BMS & \xmark & \xmark & \xmark & \pmark & \xmark & \xmark \\ \hline
-IC kunci tersimpan (TI bq, OPTIGA) & \cmark & \cmark & \xmark & \xmark & \pmark & \xmark \\ \hline
-IC berbasis PUF (DS28E38) & \cmark & \cmark & \cmark & \xmark & \cmark & \xmark \\ \hline
-\textbf{Usulan} (target desain) & \cmark & \pmark & \cmark & \cmark & \cmark & \cmark \\ \hline
+\hdr{Pendekatan} & \hdr{Sulit dikloning} & \hdr{Tahan serangan fisik} & \hdr{Tanpa kunci di chip} & \hdr{Desain dapat diperiksa} & \hdr{Enrolment pihak tepercaya} & \hdr{Riwayat lintas operator} \\ \hline
+Label atau kode QR & \xmark & \xmark & -- & -- & \sbg & \sbg \\ \hline
+Kunci di firmware BMS & \xmark & \xmark & \xmark & \sbg & \xmark & \xmark \\ \hline
+IC dengan kunci tersimpan\newline{\footnotesize\color{subtle}contoh: TI bq, OPTIGA} & \cmark & \cmark & \xmark & \xmark & \sbg & \xmark \\ \hline
+IC berbasis PUF\newline{\footnotesize\color{subtle}contoh: DS28E38} & \cmark & \cmark & \cmark & \xmark & \cmark & \xmark \\ \hline
+\textbf{Usulan}\newline{\footnotesize\color{subtle}target desain} & \cmark & \sbg & \cmark & \cmark & \cmark & \cmark \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -254,14 +256,14 @@ Perancangan diarahkan untuk menjawab satu pertanyaan, yaitu bagaimana membangun 
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\linewidth}{|c|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.3cm}|}
+\begin{tabularx}{\linewidth}{|c|>{\raggedright\arraybackslash}p{2.7cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.0cm}|}
 \hline
-\hdr{ID} & \hdr{Kebutuhan} & \hdr{Target} & \hdr{Metode pengukuran} \\ \hline
-R1 & Identitas tidak dapat dikloning & Kunci berasal dari PUF dan tidak disimpan di memori. Kunci sama pada $\geq$1.000 kali regenerasi di suhu ruang. \emph{Hamming distance} antar-lokasi mendekati 50\% & \emph{Hash} kunci tiap regenerasi dan \emph{Hamming distance} antar-lokasi RO dan antar-board \\ \hline
-R2 & Tahan \emph{replay} & Respons lama selalu ditolak. \emph{Latency} respons $<$50 ms & Uji \emph{replay} dan hitung \emph{clock cycle} \\ \hline
-R3 & Riwayat tepercaya & Riwayat dicatat stasiun ke basis data identitas. Perubahan karakteristik sel yang tidak wajar ditandai & Skenario demo dengan basis data emulasi \\ \hline
-R4 & \emph{Fail-secure} & \emph{Glitch} clock atau casing terbuka $\rightarrow$ register kunci di-\emph{zeroize} dan chip masuk \emph{lock} & Rekonfigurasi PLL dan pin \emph{tamper} di board \\ \hline
-R5 & Area kecil dan siap ASIC & Tanpa NVM untuk data, tanpa DSP, $<$15\% ALM Cyclone~V & Hasil sintesis Quartus dan Yosys \\ \hline
+\hdr{ID} & \hdr{Kebutuhan} & \hdr{Target} & \hdr{Cara mengukur} \\ \hline
+R1 & Sulit dikloning & Kunci dari PUF, tidak disimpan. Kunci tetap sama pada $\geq$1.000 kali pembacaan di suhu ruang dan berbeda antar-chip (\emph{Hamming distance} $\approx$50\%) & Bandingkan kunci tiap pembacaan, antar-lokasi RO, dan antar-board \\ \hline
+R2 & Tahan \emph{replay} & Respons lama selalu ditolak. Respons selesai $<$50 ms & Uji \emph{replay} dan hitung \emph{clock cycle} \\ \hline
+R3 & Riwayat tepercaya & Riwayat berasal dari pengukuran stasiun. Perubahan sel yang janggal ditandai & Skenario demo dengan basis data emulasi \\ \hline
+R4 & \emph{Fail-secure} & \emph{Glitch} clock atau casing terbuka $\rightarrow$ kunci dihapus dan chip terkunci & \emph{Glitch} melalui PLL dan pin \emph{tamper} \\ \hline
+R5 & Kecil, siap ASIC & Tanpa NVM untuk data, tanpa DSP, $<$15\% ALM Cyclone~V & Sintesis Quartus dan Yosys \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -270,7 +272,7 @@ R5 & Area kecil dan siap ASIC & Tanpa NVM untuk data, tanpa DSP, $<$15\% ALM Cyc
 
 \subsection{Fungsi Utama}
 
-Chip ini memiliki satu fungsi inti, yaitu membuktikan identitas \emph{pack} kepada stasiun tanpa menyimpan kunci. Setiap chip memiliki ``sidik jari'' alami dari variasi fabrikasi silikon yang dibaca ulang oleh \emph{Ring-Oscillator PUF} (RO-PUF) setiap kali dibutuhkan~\cite{suh}. Dari sidik jari tersebut chip menurunkan kunci, menjawab \emph{nonce} dari basis data identitas, lalu menghapus kunci.
+Chip ini memiliki satu fungsi inti, yaitu membuktikan identitas \emph{pack} baterai kepada basis data identitas melalui stasiun, tanpa menyimpan kunci di dalam chip. Variasi fabrikasi membuat setiap chip memiliki ``sidik jari'' silikon yang unik. Rangkaian \emph{Ring-Oscillator PUF} (RO-PUF) membaca sidik jari ini setiap kali dibutuhkan~\cite{suh}. Chip kemudian menurunkan kunci darinya, menghitung respons atas \emph{nonce} dari basis data identitas, dan langsung menghapus kunci.
 
 \subsection{Arsitektur dan Alur Data}
 
@@ -416,7 +418,7 @@ Penyerang fisik & Memanipulasi \emph{helper data} & \emph{Helper data} masuk KDF
 \subsection{Batasan dan Pengembangan Lanjutan}
 
 \begin{itemize}
-  \item Proteksi \emph{side-channel}~\cite{dpa}, keandalan PUF pada rentang suhu \emph{pack}, dan penuaan di luar cakupan prototipe.
+  \item Proteksi \emph{side-channel}~\cite{dpa}, keandalan PUF pada rentang suhu \emph{pack} baterai, dan penuaan di luar cakupan prototipe.
   \item Pada prototipe, \emph{bitstream} diasumsikan tepercaya. Salinan kunci simetris di HSM menjadikan basis data titik rawan tunggal. Versi ASIC direncanakan memiliki eFuse dan tanda tangan ECC sehingga basis data cukup menyimpan kunci publik dan verifikasi dapat dilakukan luring.
   \item Bila PUF belum stabil, demo menggunakan kunci tetap yang disampaikan terbuka kepada juri.
 \end{itemize}
