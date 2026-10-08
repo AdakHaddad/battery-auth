@@ -34,6 +34,11 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
 \usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle={Secure Battery Identity Chip},
+  pdfauthor={Guntur Sulistyo, Dimas Eryan Ahnaf Fahrezi, Muhammad Muqtada Alhaddad (Universitas Gadjah Mada)},
+  pdfsubject={Proposal Hackathon Chip 2026, IC Chip Design \& FPGA Implementation},
+}
 
 % ---------- Warna ----------
 \definecolor{hdrgreen}{HTML}{E6EFC5}   % header tabel seperti template
@@ -81,7 +86,7 @@
 \thispagestyle{empty}
 \definecolor{navy}{HTML}{1E1B4B}
 \definecolor{ink}{HTML}{0F172A}
-\definecolor{motif}{HTML}{C7D2FE}
+\definecolor{motif}{HTML}{A5B4FC}
 \begin{tikzpicture}[remember picture, overlay]
   % --- Pita kiri
   \fill[navy] (current page.north west) rectangle ([xshift=9mm]current page.south west);
@@ -106,7 +111,7 @@
       \foreach \k in {0,1,2,3} {
         \pgfmathsetmacro{\st}{\k*90 + \r*11 + rnd*20}
         \pgfmathsetmacro{\ln}{52 + rnd*26}
-        \draw[secline!45, line width=0.9pt, line cap=round]
+        \draw[secline!65, line width=0.9pt, line cap=round]
           ([shift={(\st:\r mm)}]0,0) arc[start angle=\st, delta angle=\ln, radius=\r mm];
       }
     }
@@ -125,29 +130,29 @@
 \vspace*{0.6cm}
 {\footnotesize\bfseries\color{secline} PROPOSAL PESERTA \quad\textcolor{subtle!60}{|}\quad \textcolor{subtle}{HACKATHON CHIP 2026}\par}
 \vspace{3pt}
-{\footnotesize\color{subtle} IC Chip Design \& FPGA Implementation \,\textperiodcentered\, Topik 1: Secure Identity \& Security Element Chip\par}
+{\footnotesize\color{subtle} Kategori: IC Chip Design \& FPGA Implementation \,\textperiodcentered\, Topik 1: Secure Identity \& Security Element Chip\par}
 
 \vspace{2.6cm}
 {\fontsize{46}{50}\selectfont\bfseries\color{ink} Secure Battery\\[2pt] Identity Chip\par}
 \vspace{14pt}
 {\color{secline}\rule{2.4cm}{3pt}\par}
 \vspace{14pt}
-\begin{minipage}{0.78\linewidth}
-{\fontsize{15}{20}\selectfont\color{ink!80} \emph{Secure element} berbasis PUF untuk autentikasi baterai pada ekosistem tukar baterai kendaraan listrik\par}
+\begin{minipage}{0.86\linewidth}
+{\fontsize{15}{20}\selectfont\color{ink!80}\raggedright\hyphenpenalty=10000 Chip keamanan yang membuktikan keaslian baterai di stasiun tukar baterai kendaraan listrik, dengan kunci dari sidik jari silikon (PUF) yang tidak disimpan di chip\par}
 \end{minipage}
 
 
 \vfill
 \newcommand{\role}[1]{{\scriptsize\bfseries\color{subtle}#1}}
-\newcommand{\person}[2]{{\small\color{ink}#1}\newline{\scriptsize\color{subtle}#2}}
-\begin{minipage}{0.62\linewidth}
+\newcommand{\person}[2]{{\small\color{ink}#1}\newline{\footnotesize\color{ink!70}Universitas Gadjah Mada}\newline{\footnotesize\color{ink!70}#2}}
+\begin{minipage}{0.68\linewidth}
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}p{6.4cm}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}p{7.6cm}@{}}
 \role{NAMA TIM} & {\small\bfseries\color{ink}\todo{Nama Tim}} \\[8pt]
 \role{KETUA} & \person{Guntur Sulistyo}{guntursulistyo@mail.ugm.ac.id} \\[8pt]
 \role{ANGGOTA} & \person{Dimas Eryan Ahnaf Fahrezi}{dimaseryanahnaffahrezi@mail.ugm.ac.id} \\[8pt]
 & \person{Muhammad Muqtada Alhaddad}{muhammadmuqtadaalhaddad@mail.ugm.ac.id} \\[8pt]
-\role{DOSEN PEMBIMBING} & {\small\color{ink}Ir. Agus Bejo, S.T., M.Eng., D.Eng., IPM} \\
+\role{DOSEN PEMBIMBING} & {\small\color{ink}Ir. Agus Bejo, S.T., M.Eng., D.Eng., IPM}\newline{\footnotesize\color{ink!70}Universitas Gadjah Mada} \\
 \end{tabular}
 \end{minipage}
 \vspace*{1.4cm}
@@ -158,146 +163,140 @@
 % =====================================================================
 \section{Executive Summary}
 
-Setiap hari, pengendara motor listrik menukar baterai kosong dengan baterai penuh di stasiun penukaran dalam hitungan menit. Baterai tersebut merupakan aset bersama yang berpindah dari satu pengendara ke pengendara lain dan dapat melewati beberapa operator dengan sistem yang berbeda. Saat menerima sebuah baterai, stasiun hanya dapat membaca data yang dilaporkan baterai itu sendiri sehingga keaslian dan catatan pemakaiannya tidak dapat dibuktikan. Baterai palsu atau bekas yang dirakit ulang tanpa standar dapat lolos ke jaringan dan berisiko memicu kebakaran. Jumlah siklus pemakaian juga dapat diubah agar baterai tua tampak baru, seperti odometer mobil bekas yang diputar mundur. Dengan jumlah motor listrik yang telah mencapai sekitar 168 ribu unit pada akhir 2024~\cite{ruptl}, kebutuhan akan identitas baterai yang dapat diverifikasi lintas operator akan terus bertambah.
+Setiap hari, pengendara motor listrik menukar baterai kosong dengan baterai penuh di stasiun penukaran baterai (SPBKLU). Baterai tersebut merupakan aset bersama yang berpindah dari satu pengendara ke pengendara lain dan dapat melewati beberapa operator dengan sistem yang berbeda. Saat menerima sebuah baterai, stasiun hanya dapat membaca data yang dilaporkan baterai itu sendiri sehingga keaslian dan catatan pemakaiannya tidak dapat dibuktikan. Baterai palsu atau bekas yang dirakit ulang tanpa standar dapat lolos ke jaringan dan berisiko memicu kebakaran. Jumlah siklus pemakaian juga dapat diubah agar baterai tua tampak baru, seperti odometer mobil bekas yang diputar mundur. Kedua celah ini makin luas seiring bertambahnya motor listrik, yang pada akhir 2024 telah mencapai sekitar 168 ribu unit~\cite{ruptl}.
 
-Kami mengusulkan Secure Battery Identity Chip, chip keamanan kecil yang ditanam di dalam setiap \emph{pack} baterai. Chip ini memiliki ``sidik jari'' alami dari variasi fabrikasi silikon yang tidak pernah disimpan, sehingga tidak ada kunci di memori chip yang dapat dibaca atau disalin. Saat baterai masuk, stasiun mengirim tantangan acak yang hanya dapat dijawab dengan benar oleh chip asli. Catatan pemakaian bersumber dari pengukuran stasiun ketika mengisi daya baterai dan disimpan di basis data identitas yang dikelola lembaga penjamin keaslian. Jika chip mendeteksi upaya pembongkaran atau gangguan listrik, chip berhenti menjawab dan basis data memblokir identitasnya secara permanen.
-
-Riwayat di basis data tersebut hanya bermakna apabila setiap baterai memiliki identitas yang tidak dapat dipalsukan, karena tanpa identitas tersebut riwayat baterai asli dapat ditempelkan pada baterai palsu. Identitas ini harus diwujudkan sebagai chip di dalam \emph{pack}, satu-satunya komponen yang ikut berpindah bersama baterai dan dapat dirancang untuk menahan serangan fisik. Keamanan menjadi dasar rancangan sejak awal, dengan setiap blok chip dirancang terhadap ancaman tertentu (Bagian~5).
-
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.12}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.1cm}|X|}
-\hline
-\hdr{Arsitektur target} & \emph{Secure element} tanpa memori non-volatil dengan identitas berbasis PUF, HMAC-SHA-256, FSM \emph{challenge--response}, dan respons \emph{tamper}. RO-PUF fisik, \emph{fuzzy extractor}, monitor \emph{tamper}, dan implementasi ASIC SKY130 merupakan target pengembangan; prototipe RTL saat ini memakai PUF perilaku deterministik. \\ \hline
-\hdr{Target pengguna} & Operator stasiun dan penyedia sewa baterai (pemeriksa), produsen baterai dan BMS (pemasang chip), serta lembaga penjamin keaslian (pengelola basis data identitas). Adopsi dapat didorong melalui standar identitas baterai. \\ \hline
-\hdr{Dampak} & Baterai yang tidak dikenal ditolak sebelum diserahkan (keselamatan). Nilai sisa dan garansi ditentukan dari riwayat yang tepercaya (ekonomi). Akar kepercayaan dirancang di dalam negeri (kemandirian). \\ \hline
-\hdr{Status prototipe} & Simulasi RTL dengan Verilator telah menguji SHA-256, HMAC-SHA-256, FSM, autentikasi valid/tidak valid, dan \emph{zeroize}. Validasi pada DE10-Nano, PUF fisik, uji \emph{replay}, dan deteksi pembongkaran masih direncanakan. \\ \hline
-\end{tabularx}
-\end{center}
-
-Kebaruan usulan ini terletak pada pembagian peran yang tegas. Chip membuktikan identitas, stasiun mengukur, dan basis data mengingat. Dengan pembagian ini, chip tetap kecil, tanpa memori non-volatil, tanpa kunci tersimpan, dan dapat diverifikasi oleh operator mana pun.
+Kami mengusulkan Secure Battery Identity Chip, chip keamanan kecil yang ditanam di dalam setiap baterai. Arsitektur target menggunakan variasi fabrikasi silikon sebagai akar identitas dan menurunkan kunci saat autentikasi. Pada prototipe RTL saat ini, PUF fisik belum dibuat: simulasi memakai model LFSR perilaku yang deterministik, sehingga belum membuktikan sidik jari silikon atau karakteristik fisik. Saat baterai masuk, basis data identitas mengirim angka acak sekali pakai (\emph{nonce}) untuk autentikasi (Gambar~\ref{fig:konsep}). Catatan pemakaian berasal dari pengukuran stasiun saat mengisi daya dan disimpan di basis data identitas yang dikelola lembaga penjamin keaslian. Deteksi pembongkaran dan gangguan listrik tetap menjadi sasaran pengembangan.
 
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
   font=\sffamily\small,
-  actor/.style={draw=ink!80, line width=0.7pt, align=center, minimum width=3.1cm, minimum height=1.45cm, fill=white},
+  actor/.style={draw=ink!80, line width=0.7pt, align=center, minimum width=3.1cm, minimum height=1.25cm, fill=white},
   flow/.style={-{Stealth[length=2mm]}, line width=0.7pt, draw=secline},
   back/.style={-{Stealth[length=2mm]}, line width=0.7pt, draw=ink!70},
   lbl/.style={font=\sffamily\footnotesize, text=ink!85, align=center},
   role/.style={font=\sffamily\footnotesize\itshape, text=subtle, align=center, text width=3.4cm}
 ]
-  \node[actor] (pack) at (0,0)    {\textbf{\emph{Pack} baterai}\\[1pt]\footnotesize chip + BMS};
+  \node[actor] (pack) at (0,0)    {\textbf{Baterai}\\[1pt]\footnotesize chip + BMS};
   \node[actor] (st)   at (6.2,0)  {\textbf{Stasiun}\\[1pt]\footnotesize penukaran};
   \node[actor] (reg)  at (12.4,0) {\textbf{Basis data identitas}\\[1pt]\footnotesize pihak tepercaya};
 
-  \draw[flow] ([yshift=3.5mm]st.west) -- node[lbl, above]{(1) tantangan acak} ([yshift=3.5mm]pack.east);
-  \draw[back] ([yshift=-3.5mm]pack.east) -- node[lbl, below]{(2) respons} ([yshift=-3.5mm]st.west);
-  \draw[flow] ([yshift=3.5mm]st.east) -- node[lbl, above]{(3) ID, respons,\\hasil ukur} ([yshift=3.5mm]reg.west);
-  \draw[back] ([yshift=-3.5mm]reg.west) -- node[lbl, below]{(4) valid atau\\tidak valid} ([yshift=-3.5mm]st.east);
+  \draw[back] ([yshift=3.5mm]reg.west) -- node[lbl, above]{(1) \emph{nonce}\\(5) valid/tidak valid} ([yshift=3.5mm]st.east);
+  \draw[flow] ([yshift=3.5mm]st.west) -- node[lbl, above]{(2) \emph{nonce}} ([yshift=3.5mm]pack.east);
+  \draw[back] ([yshift=-3.5mm]pack.east) -- node[lbl, below]{(3) respons} ([yshift=-3.5mm]st.west);
+  \draw[flow] ([yshift=-3.5mm]st.east) -- node[lbl, below]{(4) ID, respons,\\hasil ukur} ([yshift=-3.5mm]reg.west);
 
 \end{tikzpicture}
 \caption{Alur verifikasi baterai di stasiun penukaran.}
 \label{fig:konsep}
 \end{figure}
 
+Riwayat tersebut hanya bermakna apabila identitas baterai tidak dapat dipalsukan. Karena itu, identitas diwujudkan sebagai chip di dalam baterai, satu-satunya komponen yang ikut berpindah bersama baterai dan dapat dirancang untuk menahan serangan fisik.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.1cm}|X|}
+\hline
+\hdr{Arsitektur target} & \emph{Secure element} tanpa memori non-volatil dengan identitas berbasis PUF, HMAC-SHA-256, FSM \emph{challenge--response}, dan respons \emph{tamper}. RO-PUF fisik, \emph{fuzzy extractor}, monitor \emph{tamper}, dan implementasi ASIC SKY130 merupakan target pengembangan; model PUF RTL saat ini bersifat perilaku dan deterministik. \\ \hline
+\hdr{Target pengguna} & Operator stasiun dan penyedia sewa baterai (pemeriksa), produsen baterai dan BMS (pemasang chip), serta lembaga penjamin keaslian (pengelola basis data identitas). Adopsi dapat didorong melalui standar identitas baterai. \\ \hline
+\hdr{Dampak} & Baterai yang tidak dikenal ditolak sebelum diserahkan (keselamatan). Harga jual kembali dan garansi ditentukan dari riwayat yang tepercaya (ekonomi). Akar kepercayaan dirancang di dalam negeri (kemandirian). \\ \hline
+\hdr{Status prototipe} & Simulasi Verilator telah menguji SHA-256, HMAC-SHA-256, FSM, autentikasi valid/tidak valid, dan \emph{zeroize}. Validasi DE10-Nano, PUF fisik, uji \emph{replay}, dan deteksi pembongkaran masih direncanakan. \\ \hline
+\end{tabularx}
+\end{center}
+
+Kebaruan usulan ini terletak pada pembagian peran yang tegas. Chip membuktikan identitas, stasiun mengukur, dan basis data mengingat. Dengan pembagian ini, chip tetap kecil, tanpa memori non-volatil untuk kunci dan data, dan dapat diverifikasi oleh operator mana pun yang terhubung ke basis data identitas.
+
+
 % =====================================================================
 \section{Problem Statement}
 
-\subsection{Baterai sebagai Aset Bersama}
+\subsection{Latar Belakang}
 
-Percepatan kendaraan bermotor listrik berbasis baterai diatur melalui Perpres No.~55 Tahun 2019 dan perubahannya, Perpres No.~79 Tahun 2023~\cite{perpres55,perpres79}. Hingga Desember 2024, jumlah kendaraan listrik roda dua telah mencapai $\sim$168 ribu unit, lebih dari dua kali jumlah roda empat ($\sim$69 ribu unit). Untuk segmen roda dua dikembangkan Stasiun Penukaran Baterai Kendaraan Listrik Umum (SPBKLU)~\cite{ruptl}. Badan usaha SPBKLU cukup memiliki NIB dan nomor identitas SPBKLU tanpa izin usaha penyediaan tenaga listrik~\cite{rukn}. Hambatan masuk yang rendah ini mendorong munculnya banyak operator dengan sistem yang berbeda-beda.
+Percepatan kendaraan bermotor listrik berbasis baterai diatur melalui Perpres No.~55 Tahun 2019 dan perubahannya, Perpres No.~79 Tahun 2023~\cite{perpres55,perpres79}. Hingga Desember 2024, jumlah kendaraan listrik roda dua telah mencapai sekitar 168 ribu unit, lebih dari dua kali jumlah roda empat~\cite{ruptl}. Untuk segmen ini dikembangkan Stasiun Penukaran Baterai Kendaraan Listrik Umum (SPBKLU), yang dalam RUPTL PLN 2025--2034 diintegrasikan ke dalam platform layanan kendaraan listrik PLN~\cite{ruptl}. Skalanya akan terus membesar karena RUKN menargetkan penetrasi sepeda motor listrik sebanyak 2,9--3,8 juta unit pada 2030 dan 5,5--5,7 juta unit pada 2035~\cite{rukn}. Pada model tukar baterai, pengendara hanya menyewa baterai milik operator atau penyedia sewa. Setelah diisi ulang di stasiun, baterai yang sama diserahkan kepada pengendara lain, sehingga sebagian besar masa pakainya berlangsung di luar pengawasan pemiliknya. Badan usaha SPBKLU cukup memiliki NIB dan nomor identitas SPBKLU tanpa izin usaha penyediaan tenaga listrik~\cite{rukn}, sehingga operator dengan sistem yang berbeda dapat terus bertambah. Di tingkat global, Regulasi Baterai Uni Eropa 2023/1542 mewajibkan paspor baterai digital, termasuk untuk baterai kendaraan ringan~\cite{eubat}. Identitas baterai yang dapat diverifikasi mulai menjadi kebutuhan yang diatur.
 
 \subsection{Tiga Masalah Inti}
 
+Seperti dokumen berharga, baterai tukar terus berpindah tangan. Karena itu, keaslian dan riwayatnya perlu dibuktikan secara elektronik di setiap stasiun yang menerimanya. Tiga masalah muncul dari kebutuhan tersebut.
+
 \begin{enumerate}[label=\textbf{P\arabic*.}, leftmargin=2.2em]
-  \item \textbf{Keaslian baterai tidak dapat dibuktikan.} Nomor seri, label, dan kode QR mudah disalin. Baterai palsu atau bekas yang dirakit ulang tanpa standar dapat masuk ke jaringan, padahal sel litium yang tidak memenuhi standar berisiko mengalami \emph{thermal runaway}.
-  \item \textbf{Riwayat baterai bergantung pada pengakuan baterai itu sendiri.} Jumlah siklus dan kondisi kesehatan dilaporkan oleh BMS di dalam pack, yang dapat diprogram ulang. Padahal nilai sisa, klaim garansi, dan keputusan keselamatan bergantung pada data ini.
-  \item \textbf{Kepercayaan tidak berlaku lintas operator.} Tanpa basis data bersama yang netral, identitas dan riwayat baterai dari satu jaringan tidak dapat diverifikasi di jaringan lain. Interoperabilitas membutuhkan standar bersama. Chip ini dirancang untuk menjadi bagian dari standar tersebut.
+  \item \textbf{Keaslian baterai tidak dapat dibuktikan secara independen.} Nomor seri, label, dan kode QR mudah disalin, sedangkan autentikasi milik operator hanya berlaku di jaringannya sendiri. Pihak yang mencari keuntungan dapat menyerahkan baterai palsu di stasiun dan membawa pulang baterai asli. Operator kehilangan aset, sedangkan pengendara berikutnya menerima baterai dengan sel yang berisiko mengalami \emph{thermal runaway}.
+  \item \textbf{Riwayat baterai hanya bersumber dari data yang dilaporkan baterai itu sendiri.} Jumlah siklus dan kondisi kesehatan dilaporkan oleh BMS (\emph{Battery Management System}), papan pengendali di dalam \emph{pack} baterai, yaitu satu unit berisi sel, BMS, dan casing. BMS dapat diprogram ulang untuk memalsukan data tersebut. Padahal, harga jual kembali, klaim garansi, dan keputusan keselamatan ditentukan dari data itu.
+  \item \textbf{Kepercayaan tidak berlaku lintas operator.} Operator yang bersaing cenderung tidak mempercayai basis data milik pesaingnya. Ketika baterai mulai distandarkan antaroperator, baterai yang ditolak di satu jaringan dapat beredar di jaringan lain. Pembeli baterai bekas, pihak daur ulang, dan penjamin garansi juga tidak memiliki sumber netral untuk memeriksa riwayatnya.
 \end{enumerate}
 
-Ketiga masalah ini serupa dengan persoalan pemalsuan dokumen berharga, yaitu membuktikan bahwa sebuah benda asli dan riwayatnya tidak diubah. Bedanya, objeknya kini aset fisik bernilai jutaan rupiah per unit. Buktinya pun harus dapat diperiksa secara elektronik di setiap stasiun.
+\subsection{Alasan Diperlukannya Chip}
 
-\subsection{Mengapa Harus Diselesaikan di Level Chip}
-
-Pihak yang ingin memalsukan baterai memegang perangkatnya langsung dengan waktu tidak terbatas. Pemeriksaan berbasis perangkat lunak dapat dilewati dengan memprogram ulang firmware. Kunci rahasia yang tersimpan di memori flash dapat diekstrak melalui \emph{probing} atau injeksi kesalahan (\emph{fault injection})~\cite{barel}. Satu kunci yang bocor cukup untuk mengkloning ribuan baterai. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat. Kunci tidak boleh ada dalam bentuk tersimpan~\cite{suh,maes}, perhitungan kriptografi harus terisolasi dari firmware, dan chip harus mampu merespons serangan fisik tanpa bantuan perangkat lain.
+Identitas baterai tidak dapat diserahkan kepada perangkat lunak. Pemalsu memegang baterai tanpa batas waktu, sehingga firmware dapat diprogram ulang dan kunci di memori flash dapat diekstrak melalui \emph{probing} atau \emph{fault injection}~\cite{barel}. Satu kunci asli yang bocor kemudian dapat disalin ke banyak baterai palsu. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat, yaitu kunci tidak tersimpan di chip~\cite{suh,maes}, kriptografi terisolasi dari firmware, dan chip mampu merespons serangan fisik secara mandiri. Chip asli yang dipindahkan ke \emph{pack} baterai palsu tetap dapat menjawab dengan benar. Celah ini dipersempit di tingkat sistem dengan mencocokkan hasil ukur sel terhadap riwayat identitasnya.
 
 \subsection{Kesenjangan Solusi yang Tersedia}
+\newcommand{\sbg}{{\footnotesize\color{subtle}sebagian}}
 
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|*{5}{>{\centering\arraybackslash}p{1.65cm}|}}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|*{6}{>{\centering\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}m{1.5cm}|}}
 \hline
-\hdr{Pendekatan} & \hdr{Tahan kloning} & \hdr{Tahan serangan fisik} & \hdr{Tanpa NVM} & \hdr{Lintas operator} & \hdr{Desain terbuka} \\ \hline
-Nomor seri, label, kode QR & \xmark & \xmark & \cmark & \pmark & \cmark \\ \hline
-Kunci di firmware BMS & \xmark & \xmark & \xmark & \xmark & \cmark \\ \hline
-IC autentikasi baterai komersial & \cmark & \cmark & \xmark & \pmark & \xmark \\ \hline
-\textbf{Usulan} & \cmark & \pmark & \cmark & \cmark & \cmark \\ \hline
+\hdr{Pendekatan} & \hdr{Sulit dikloning} & \hdr{Tahan serangan fisik} & \hdr{Tanpa kunci di chip} & \hdr{Desain dapat diperiksa} & \hdr{Enrolment pihak tepercaya} & \hdr{Riwayat lintas operator} \\ \hline
+Label atau kode QR & \xmark & \xmark & -- & -- & \sbg & \sbg \\ \hline
+Kunci di firmware BMS & \xmark & \xmark & \xmark & \sbg & \xmark & \xmark \\ \hline
+IC dengan kunci tersimpan\newline{\footnotesize\color{subtle}contoh: TI bq, OPTIGA} & \cmark & \cmark & \xmark & \xmark & \sbg & \xmark \\ \hline
+IC berbasis PUF\newline{\footnotesize\color{subtle}contoh: DS28E38} & \cmark & \cmark & \cmark & \xmark & \cmark & \xmark \\ \hline
+\textbf{Usulan}\newline{\footnotesize\color{subtle}target desain} & \cmark & \sbg & \cmark & \cmark & \cmark & \cmark \\ \hline
 \end{tabularx}
 \end{center}
-\vspace{-8pt}
-{\footnotesize\color{subtle} \cmark{} terpenuhi \quad \pmark{} sebagian \quad \xmark{} tidak terpenuhi. Usulan dinilai ``sebagian'' pada serangan fisik karena proteksi \emph{side-channel} berada di luar cakupan prototipe (Bagian~5.3).\par}
 
-IC autentikasi komersial telah menyelesaikan masalah kloning. Namun, IC tersebut menyimpan kunci di memori non-volatil terlindungi, bersifat tertutup, dan bergantung pada rantai \emph{provisioning} vendor. Usulan ini mengisi celah tersebut dengan akar kepercayaan yang terbuka, tanpa kunci tersimpan, dan dapat diverifikasi lintas operator melalui basis data identitas yang netral.
+IC komersial sudah tahan kloning dan serangan fisik, baik yang menyimpan kunci di memori~\cite{bq26100} maupun yang menurunkan kunci dari PUF seperti DS28E38~\cite{ds28e38}. Namun, keduanya berdesain tertutup sehingga pihak tepercaya tidak dapat memeriksa cara kunci dibangkitkan. Pembeda usulan ini adalah RTL terbuka yang dapat diperiksa dan integrasi dengan basis data identitas lintas operator.
 
-\subsection{Kebutuhan Desain dan Target Terukur}
+\subsection{Rumusan Masalah dan Kebutuhan Desain}
 
 Perancangan diarahkan untuk menjawab satu pertanyaan, yaitu bagaimana membangun \emph{secure element} yang memenuhi lima kebutuhan berikut dengan area cukup kecil untuk ditanam di setiap pack baterai. Semua angka pada tabel berikut adalah target yang akan diukur selama pengembangan.
 
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\linewidth}{|c|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.3cm}|}
+\begin{tabularx}{\linewidth}{|c|>{\raggedright\arraybackslash}p{2.7cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.0cm}|}
 \hline
-\hdr{ID} & \hdr{Kebutuhan} & \hdr{Target} & \hdr{Metode pengukuran} \\ \hline
-R1 & Identitas tidak dapat dikloning & Kunci dari PUF dan tidak tersimpan. Kunci identik pada $\geq$1.000 regenerasi (suhu ruang), \emph{inter-distance} $\approx$50\% & Hash kunci tiap regenerasi dan jarak Hamming antar-lokasi RO \\ \hline
-R2 & Autentikasi yang segar & Respons lama selalu ditolak, waktu respons $<$50 ms & Uji \emph{replay} dan penghitungan siklus \\ \hline
-R3 & Riwayat yang tepercaya & Riwayat dicatat stasiun ke basis data identitas. Perubahan karakteristik yang janggal ditandai & Skenario demo dengan basis data emulasi \\ \hline
-R4 & Gagal dengan aman & \emph{Glitch} clock atau casing terbuka $\rightarrow$ kunci dihapus dan chip terkunci & Rekonfigurasi PLL dan pin \emph{tamper} di board \\ \hline
-R5 & Ringan dan siap ASIC & Tanpa NVM, tanpa DSP, $<$15\% ALM Cyclone~V & Sintesis Quartus dan Yosys \\ \hline
+\hdr{ID} & \hdr{Kebutuhan} & \hdr{Target} & \hdr{Cara mengukur} \\ \hline
+R1 & Sulit dikloning & Kunci dari PUF, tidak disimpan. Kunci tetap sama pada $\geq$1.000 kali pembacaan di suhu ruang dan berbeda antar-chip (\emph{Hamming distance} $\approx$50\%) & Bandingkan kunci tiap pembacaan, antar-lokasi RO, dan antar-board \\ \hline
+R2 & Tahan \emph{replay} & Respons lama selalu ditolak. Respons selesai $<$50 ms & Uji \emph{replay} dan hitung \emph{clock cycle} \\ \hline
+R3 & Riwayat tepercaya & Riwayat berasal dari pengukuran stasiun. Perubahan sel yang janggal ditandai & Skenario demo dengan basis data emulasi \\ \hline
+R4 & \emph{Fail-secure} & \emph{Glitch} clock atau casing terbuka $\rightarrow$ kunci dihapus dan chip terkunci & \emph{Glitch} melalui PLL dan pin \emph{tamper} \\ \hline
+R5 & Kecil, siap ASIC & Tanpa NVM untuk data, tanpa DSP, $<$15\% ALM Cyclone~V & Sintesis Quartus dan Yosys \\ \hline
 \end{tabularx}
 \end{center}
 
 % =====================================================================
 \section{Proposed Chip}
 
-\subsection{Konsep Sistem dan Pembagian Peran}
+\subsection{Fungsi Utama}
 
-Sistem pada Gambar~\ref{fig:konsep} melibatkan tiga pihak dengan peran terpisah.
+Chip ini memiliki satu fungsi inti, yaitu membuktikan identitas \emph{pack} baterai kepada basis data identitas melalui stasiun, tanpa menyimpan kunci di dalam chip. Variasi fabrikasi membuat setiap chip memiliki ``sidik jari'' silikon yang unik. Rangkaian \emph{Ring-Oscillator PUF} (RO-PUF) membaca sidik jari ini setiap kali dibutuhkan. Chip kemudian menurunkan kunci darinya, menghitung respons atas \emph{nonce} dari basis data identitas, dan langsung menghapus kunci.
 
-\begin{itemize}
-  \item \textbf{Chip di dalam \emph{pack}} --- membuktikan identitas melalui \emph{challenge--response}, tidak menyimpan kunci, dan berhenti menjawab saat mendeteksi serangan.
-  \item \textbf{Stasiun} --- membangkitkan \emph{nonce}, mengukur kondisi baterai (kapasitas dan resistansi dalam) saat mengisi, dan menolak baterai yang tidak lolos verifikasi.
-  \item \textbf{Basis data identitas} --- dikelola pihak tepercaya, menyimpan data enrolment di dalam modul keamanan (HSM), memverifikasi respons, dan mencatat riwayat setiap baterai dari hasil pengukuran stasiun.
-\end{itemize}
-
-Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS yang diprogram ulang (P2). Setiap identitas juga memiliki riwayat karakteristik sel, sehingga chip asli yang dipindahkan ke pack lain akan terlihat sebagai perubahan kapasitas atau resistansi yang janggal (Bagian~5).
-
-\subsection{Arsitektur Chip}
+\subsection{Arsitektur dan Alur Data}
 
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
   font=\sffamily\small,
-  blk/.style={draw, rounded corners=3pt, align=center, minimum height=1.0cm, minimum width=3.3cm, fill=white, line width=0.7pt},
+  blk/.style={draw, rounded corners=3pt, align=center, minimum height=1.05cm, minimum width=2.8cm, fill=white, line width=0.7pt},
   key/.style={blk, fill=secfill, draw=secline},
   mon/.style={blk, fill=badfill, draw=badline},
-  host/.style={blk, fill=okfill, draw=okline, minimum width=2.9cm, text width=2.7cm},
+  host/.style={blk, fill=okfill, draw=okline, minimum width=2.6cm, text width=2.4cm},
   arr/.style={-{Stealth[length=2.2mm]}, line width=0.7pt},
-  biarr/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, line width=0.7pt},
   zer/.style={-{Stealth[length=2.2mm]}, line width=0.8pt, draw=badline, dashed},
-  lbl/.style={font=\sffamily\scriptsize, align=center}
+  lbl/.style={font=\sffamily\scriptsize, align=center},
+  langkah/.style={circle, fill=secline, text=white, font=\sffamily\scriptsize\bfseries, inner sep=1pt, minimum size=3.6mm}
 ]
-  \node[blk] (bus)  at (0,0)    {\texttt{bus\_if}\\\footnotesize register mailbox};
-  \node[blk] (ctrl) at (4.25,0)  {\texttt{auth\_ctrl}\\\footnotesize FSM perintah};
-  \node[blk] (hmac) at (8.5,0)  {\texttt{hmac\_sha256}\\\footnotesize baseline TT07};
-  \node[mon] (tamp)  at (0,-2)   {\texttt{tamper\_mon}\\\footnotesize monitor clock $\cdot$ casing};
-  \node[key] (vault) at (8.5,-2) {\texttt{key\_vault}\\\footnotesize tanpa jalur baca};
-  \node[key] (puf) at (0,-4)   {\texttt{ro\_puf}\\\footnotesize 1.024 RO + pencacah};
-  \node[key] (fe)  at (4.25,-4) {\texttt{fuzzy\_ext}\\\footnotesize TMV + kode repetisi};
-  \node[host, minimum height=1.6cm] (hps) at (-4.05,0) {\textbf{Host}\\\footnotesize BMS / stasiun\\\footnotesize (I\textsuperscript{2}C/SMBus)};
+  \node[blk] (bus)  at (0,0)     {\texttt{bus\_if}\\\footnotesize antarmuka host};
+  \node[blk] (ctrl) at (3.8,0)  {\texttt{auth\_ctrl}\\\footnotesize pengatur urutan};
+  \node[blk] (hmac) at (7.6,0)   {\texttt{hmac\_sha256}\\\footnotesize hitung respons};
+  \node[mon] (tamp)  at (0,-2)   {\texttt{tamper\_mon}\\\footnotesize deteksi gangguan};
+  \node[key] (vault) at (7.6,-2) {\texttt{key\_vault}\\\footnotesize kunci sementara};
+  \node[key] (puf) at (0,-4)     {\texttt{ro\_puf}\\\footnotesize baca sidik jari};
+  \node[key] (fe)  at (3.8,-4)  {\texttt{fuzzy\_ext}\\\footnotesize koreksi bit};
+  \node[host, minimum height=1.6cm] (hps) at (-4.9,0) {\textbf{Host}\\\footnotesize BMS / stasiun};
 
   \begin{scope}[on background layer]
     \node[draw=secline, line width=1pt, rounded corners=6pt, fill=secfill!35, inner sep=10pt,
@@ -305,25 +304,56 @@ Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS ya
           label={[font=\sffamily\small\bfseries, text=secline]above:Secure Battery Identity Chip}] (chip) {};
   \end{scope}
 
-  \draw[biarr] (hps) -- (bus);
-  \draw[biarr] (bus) -- (ctrl);
-  \draw[biarr] (ctrl) -- node[lbl, above]{pesan} (hmac);
+  % jalur perintah
+  \draw[arr] ([yshift=2.5mm]hps.east) -- node[lbl, above, pos=0.4]{\tikz[baseline=-0.6ex]\node[langkah]{1}; \emph{nonce}} ([yshift=2.5mm]bus.west);
+  \draw[arr] ([yshift=-2.5mm]bus.west) -- node[lbl, below, pos=0.6]{\tikz[baseline=-0.6ex]\node[langkah]{5}; respons} ([yshift=-2.5mm]hps.east);
+  \draw[arr] (bus) -- (ctrl);
+  \draw[arr] (ctrl) -- (hmac);
+  % jalur kunci
   \draw[arr] (puf) -- node[lbl, below]{bit\\mentah} (fe);
-  \draw[arr] (fe.east) -- (8.5,-4) -- node[lbl, right]{KDF} (vault.south);
-  \draw[arr] (vault) -- node[lbl, right]{kunci} (hmac);
-  \draw[zer] (tamp.east) -- node[lbl, below, text=badline, pos=0.7]{zeroize} (vault.west);
-  \draw[zer] (4.25,-2) -- node[lbl, right, text=badline]{lock} (ctrl.south);
-  \fill[badline] (4.25,-2) circle (1.6pt);
+  \draw[arr] (fe.east) -- (7.6,-4) -- node[lbl, right]{kunci} (vault.south);
+  \draw[arr] (vault) -- (hmac);
+  % jalur pengaman
+  \draw[zer] (tamp.east) -- node[lbl, below, text=badline, pos=0.75]{hapus kunci} (vault.west);
+  \draw[zer] (3.8,-2) -- node[lbl, right, text=badline]{kunci FSM} (ctrl.south);
+  \fill[badline] (3.8,-2) circle (1.6pt);
+
+  % urutan langkah
+  \node[langkah] at ([xshift=0.5mm, yshift=-0.5mm]puf.north west) {2};
+  \node[langkah] at ([xshift=0.5mm, yshift=-0.5mm]fe.north west) {3};
+  \node[langkah] at ([xshift=0.5mm, yshift=-0.5mm]hmac.north west) {4};
 \end{tikzpicture}
-\caption{Arsitektur chip. Blok biru menangani kunci dan tidak memiliki jalur baca ke bus. Blok merah memantau serangan, menghapus kunci (\emph{zeroize}), dan mengunci FSM (\emph{lock}).}
+\caption{Arsitektur chip. Nomor menunjukkan urutan satu autentikasi.}
+\label{fig:arsitektur}
 \end{figure}
 
-\subsection{Protokol Enrolment dan Verifikasi}
+Satu autentikasi berjalan sesuai nomor pada Gambar~\ref{fig:arsitektur}. Host mengirim \emph{nonce} dan \emph{helper data} melalui \texttt{bus\_if} (1). \texttt{ro\_puf} membaca sidik jari silikon (2), lalu \texttt{fuzzy\_ext} mengoreksi bitnya dengan bantuan \emph{helper data} dan menurunkan kunci ke \texttt{key\_vault} (3). \texttt{hmac\_sha256} menghitung respons dari kunci dan \emph{nonce} (4). Kunci kemudian dihapus dan respons dikirim ke host (5). Sepanjang waktu, \texttt{tamper\_mon} memantau clock dan casing. Bila ada gangguan, kunci langsung dihapus dan chip terkunci. Kunci tidak pernah keluar dari chip.
+
+\subsection{Data, Antarmuka, dan Memori}
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{1.3cm}|>{\centering\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.1cm}|}
+\hline
+\hdr{Data} & \hdr{Ukuran} & \hdr{Sifat} & \hdr{Tempat} & \hdr{Berlaku} \\ \hline
+Kunci & 256 bit & Rahasia & Register di dalam chip & Satu autentikasi \\ \hline
+\emph{Helper data} & 512 bit & Publik & BMS dan basis data identitas & Tetap sejak enrolment \\ \hline
+ID & 64 bit & Publik & Dihitung chip dari \emph{helper data} & Tetap \\ \hline
+\emph{Nonce} & 256 bit & Publik & Dibuat basis data identitas & Sekali pakai \\ \hline
+Respons & 256 bit & Publik & Dikirim ke basis data melalui stasiun & Sekali pakai \\ \hline
+Status \emph{lock} & 1 bit & Publik & Register di dalam chip & Selama chip berdaya \\ \hline
+\end{tabularx}
+\end{center}
+
+\subsection{Alur Operasi}
 
 \begin{enumerate}
-  \item \textbf{Enrolment} --- dilakukan sekali di pabrik baterai, dalam lingkungan tepercaya. Chip membangkitkan \emph{helper data} publik, lalu kunci turunannya diserahkan sekali ke HSM basis data identitas melalui mode enrolment. Setelah itu, logika chip menonaktifkan mode enrolment secara permanen. Basis data juga mencatat karakteristik awal \emph{pack}.
-  \item \textbf{Verifikasi} --- dilakukan pada setiap penukaran. Stasiun mengirim \emph{nonce} 256-bit. Chip membangkitkan ulang kunci, menghitung HMAC$(K, \text{nonce}\,\|\,\text{ID})$~\cite{fips198}, lalu langsung menghapus kunci. Stasiun meneruskan ID, \emph{nonce}, respons, dan hasil ukur ke basis data identitas, yang menjawab \emph{valid} atau \emph{tidak valid} sekaligus memperbarui riwayat. Stasiun tidak pernah memegang kunci chip mana pun.
+  \item \textbf{Enrolment} --- dilakukan sekali di pabrik baterai di bawah pengawasan lembaga penjamin keaslian. Chip mengirim kuncinya ke HSM dalam keadaan terenkripsi dengan kunci publik HSM yang tertanam di \emph{bitstream} pabrik. Basis data identitas mencatat \emph{helper data}, ID, dan karakteristik awal \emph{pack} baterai. Jalur pengiriman kunci ini hanya ada pada \emph{bitstream} pabrik. Pada ASIC, jalur tersebut ditutup permanen dengan eFuse setelah enrolment.
+  \item \textbf{Verifikasi} --- dilakukan pada setiap penukaran baterai. Stasiun meneruskan \emph{nonce} dari basis data identitas ke chip. Chip menjawab dengan respons HMAC$(K, \text{nonce}\,\|\,\text{ID})$. Basis data memeriksa respons tersebut bersama hasil ukur sel, memperbarui riwayat, lalu menjawab \emph{valid} atau \emph{tidak valid}. Stasiun tidak pernah memegang kunci.
 \end{enumerate}
+
+Chip yang terkunci tetap mendapat daya dari sel, sehingga statusnya terbaca oleh stasiun berikutnya dan basis data memblokir ID tersebut.
 
 % =====================================================================
 \section{Technical Design}
@@ -331,18 +361,18 @@ Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS ya
 \subsection{Rincian Modul RTL}
 
 \begin{center}
-\small
+\footnotesize
 \renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.6cm}|X|}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{3.9cm}|X|}
 \hline
-\hdr{Modul} & \hdr{Fungsi dan pendekatan RTL} \\ \hline
-\texttt{bus\_if} & Register \emph{mailbox} (CMD, STATUS, NONCE[256], RESP[256], ID, HELPER). Menggunakan AXI-Lite pada prototipe FPGA dan I\textsuperscript{2}C/SMBus pada ASIC. \\ \hline
-\texttt{auth\_ctrl} & FSM perintah \texttt{GET\_ID}, \texttt{AUTH(nonce)}, dan \texttt{STATUS}. Mode \texttt{ENROLL} hanya aktif sekali. Semua perintah ditolak saat \emph{lock}. \\ \hline
-\texttt{hmac\_sha256} & Inti SHA-256 iteratif~\cite{fips180} dari baseline TT07 (1 ronde/siklus) dengan \emph{wrapper} HMAC (ipad/opad). \\ \hline
-\texttt{ro\_puf} & 1.024 \emph{ring oscillator} (512 pasangan pembanding) dengan 16 pencacah paralel. Penempatan dikunci dengan LogicLock agar simetris. \\ \hline
-\texttt{fuzzy\_ext} & \emph{Temporal majority voting} dan kode repetisi ($n=3$) dengan \emph{helper data} publik~\cite{dodis}, mengubah 512 bit mentah menjadi 170 bit stabil. Kunci $K=$ SHA-256(bit stabil $\|$ \emph{helper data}), sehingga \emph{helper data} yang dimanipulasi selalu menghasilkan kunci salah. \\ \hline
-\texttt{key\_vault} & Register kunci tanpa jalur baca. Kunci hanya ada selama satu autentikasi (orde milidetik), lalu dihapus. \\ \hline
-\texttt{tamper\_mon} & Monitor frekuensi clock terhadap osilator internal dan pin sakelar casing yang memicu \emph{zeroize} dan \emph{lock}. Sensor \emph{canary} timing untuk \emph{glitch} tegangan bersifat eksploratif. \\ \hline
+\hdr{Modul} & \hdr{Tugas} & \hdr{Cara kerja} \\ \hline
+\texttt{bus\_if} & Antarmuka ke host & Register AXI-Lite (FPGA) atau I\textsuperscript{2}C (ASIC). Kunci tidak dapat dibaca melalui bus. \\ \hline
+\texttt{auth\_ctrl} & Mengatur urutan perintah & FSM \texttt{GET\_ID}, \texttt{AUTH}, dan \texttt{STATUS}. Membatasi laju \texttt{AUTH} dan menolak perintah saat \emph{lock}. \\ \hline
+\texttt{ro\_puf} & Sumber identitas & Target ASIC memakai \emph{ring oscillator} yang dibandingkan berpasangan; model RTL saat ini adalah LFSR deterministik untuk simulasi dan bukan PUF fisik. \\ \hline
+\texttt{fuzzy\_ext} & Membuat bit PUF stabil & \emph{Majority voting} dan kode repetisi untuk membuang bit yang berubah-ubah. Bit stabil di-\emph{hash} SHA-256 menjadi kunci 256 bit (target entropi $\geq$128 bit). \\ \hline
+\texttt{key\_vault} & Menyimpan kunci sementara & Menyimpan kunci hanya selama respons dihitung, lalu menghapusnya. Isinya tidak dapat dibaca dari luar chip. \\ \hline
+\texttt{hmac\_sha256} & Menghitung respons & Inti SHA-256 iteratif dan wrapper HMAC-SHA-256; kunci diberikan oleh blok PUF atau model perilakunya. \\ \hline
+\texttt{tamper\_mon} & Mendeteksi gangguan & Memantau clock dan sakelar casing, lalu memicu hapus kunci dan \emph{lock}. \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -351,158 +381,42 @@ Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS ya
 Verifikasi awal dilakukan melalui simulasi RTL dengan Verilator.
 SHA-256 cocok dengan vektor uji pesan kosong, \texttt{abc}, dan
 \texttt{hello}. HMAC-SHA-256 pada RTL cocok dengan RFC 4231 kasus 1
-terhadap referensi Python, dan uji integrasi AXI memverifikasi tag valid,
-penolakan tag tidak valid, serta penghapusan state sensitif melalui
-\emph{zeroize}. PUF pada simulasi adalah model LFSR deterministik untuk
-menguji antarmuka dan reproduksibilitas respons; model ini tidak
-merepresentasikan perilaku osilator fisik. Belum ada hasil pengukuran
-PUF fisik atau validasi pada board yang diklaim.
+terhadap referensi Python. Uji integrasi top-level melalui AXI juga
+memverifikasi autentikasi dengan tag cocok, penolakan tag tidak cocok,
+dan penghapusan state sensitif melalui \emph{zeroize}. FSM diuji untuk
+reset, kegagalan autentikasi, kondisi fault, pengulangan, dan START saat
+BUSY. PUF simulasi memakai model LFSR deterministik; pengujian ini hanya
+memastikan fungsi antarmuka dan reproduksibilitas respons, bukan sifat
+osilator fisik. Belum ada hasil pengukuran PUF fisik yang diklaim.
 
-\subsection{Implementasi, Sumber Daya, dan Daya}
+\subsection{Implementasi dan Estimasi Kinerja}
 
-\textbf{Prototipe FPGA.}
-Heketon diimplementasikan pada FPGA Cyclone~V SoC
-DE10-Nano menggunakan Quartus Prime Standard 25.1.
-Arsitektur memanfaatkan HPS ARM Cortex-A9 pada DE10-Nano
-sebagai sistem pemroses, sedangkan FPGA fabric digunakan
-untuk implementasi \emph{hardware security IP}. Komunikasi
-antara HPS dan FPGA dilakukan melalui jalur
-HPS-to-FPGA yang dikonfigurasi menggunakan Platform Designer.
-Dengan pendekatan ini, fungsi keamanan dapat diuji secara
-langsung pada perangkat keras dan tidak hanya melalui simulasi
-RTL.
+\textbf{Target prototipe FPGA.} Desain ditujukan untuk bagian FPGA Cyclone~V pada DE10-Nano. Prosesor ARM (HPS) pada board yang sama berperan sebagai BMS, stasiun, dan basis data identitas yang diemulasikan dengan Python. Karena antarmukanya sederhana dan tanpa NVM, desain ini juga dapat dipasang sebagai blok tambahan pada baseline chip penyelenggara~\cite{peruri}. Kompilasi awal di Quartus Prime sudah berhasil hingga tahap Assembler dengan Fmax 86,85~MHz (\emph{constraint} clock belum final).
 
-Hasil kompilasi awal menggunakan Quartus Prime menunjukkan
-bahwa proses Analysis \& Synthesis, Fitter, dan Assembler
-berhasil diselesaikan tanpa \emph{error}. Proses Assembler juga
-menghasilkan berkas pemrograman FPGA sehingga desain dapat
-dilanjutkan ke tahap pengujian \emph{on-board}. Hasil
-implementasi sumber daya ditunjukkan pada Tabel~\ref{tab:resource}.
-
-\begin{table}[ht]
+\begin{table}[!b]
 \centering
 \small
-\caption{Hasil penggunaan sumber daya implementasi awal Heketon
-pada DE10-Nano.}
-\label{tab:resource}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\linewidth}{|X|r|r|r|}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|l|c|c|c|}
 \hline
-\hdr{Sumber Daya} &
-\hdr{Terpakai} &
-\hdr{Kapasitas} &
-\hdr{Utilisasi} \\ \hline
-
-Logic (ALM) &
-2.386 &
-41.910 &
-5,7\% \\ \hline
-
-Register (FF) &
-4.341 &
-415.000 &
-1,0\% \\ \hline
-
-Block RAM (M10K) &
-0 &
-5.570 Kbit &
-0\% \\ \hline
-
-DSP Blocks &
-0 &
-112 &
-0\% \\ \hline
-
-\end{tabularx}
+\hdr{Komponen} & \hdr{Estimasi} & \hdr{Kompilasi awal} & \hdr{Kapasitas} \\ \hline
+Logika (ALM) & $\approx$4.000--6.000 & 2.386 (5,7\%) & 41.910 \\ \hline
+Register & $\approx$3.000--5.000 & 4.341 (2,6\%) & 166.036 \\ \hline
+Blok RAM (M10K) & 0--2 & 0 & 553 \\ \hline
+DSP & 0 & 0 & 112 \\ \hline
+\end{tabular}
+\caption{Sumber daya FPGA DE10-Nano. Kompilasi awal belum memuat seluruh blok IP.}
 \end{table}
 
-Hasil tersebut menunjukkan bahwa implementasi awal masih
-memiliki ruang sumber daya yang cukup besar pada FPGA.
-Penggunaan Logic sebesar 5,7\% dan register sebesar 1,0\%
-menunjukkan bahwa desain belum mendekati batas kapasitas
-perangkat. Desain juga belum menggunakan blok M10K maupun
-DSP secara eksplisit. Hal ini sesuai dengan karakteristik
-fungsi keamanan yang terutama membutuhkan logika kombinatorial,
-register, dan operasi bit-level. Nilai sumber daya tersebut
-merupakan hasil implementasi sistem \texttt{soc\_system} pada
-tahap pengembangan saat ini dan bukan merupakan estimasi
-konsumsi sumber daya final dari setiap blok IP secara terpisah.
+\textbf{Kecepatan.} Satu perhitungan HMAC membutuhkan sekitar 280 siklus clock, atau 5,6\,$\mu$s pada 50~MHz. Bagian terlama adalah pembacaan ulang PUF, dengan target total respons di bawah 50~ms.
 
-\textbf{Latensi.}
-Evaluasi latensi dilakukan pada level RTL dan setelah
-implementasi FPGA. Pengukuran dilakukan dalam satuan siklus
-clock sehingga dapat digunakan untuk membandingkan performa
-setiap operasi keamanan secara konsisten. Parameter yang
-dievaluasi meliputi waktu pemrosesan blok keamanan, waktu
-komunikasi antara HPS dan FPGA, serta waktu respons keseluruhan
-untuk satu proses autentikasi.
-
-Pada tahap awal, latensi final belum ditetapkan karena
-implementasi fungsi keamanan dan jalur komunikasi HPS--FPGA
-masih dalam tahap integrasi. Nilai latensi akan diperoleh
-melalui simulasi RTL menggunakan \emph{testbench} serta
-pengujian \emph{on-board} pada DE10-Nano. Dengan demikian,
-nilai yang dicantumkan pada hasil akhir merupakan hasil
-pengukuran aktual dan tidak bergantung pada estimasi teoritis.
-
-\textbf{Timing dan frekuensi operasi.}
-Analisis timing dilakukan menggunakan Quartus Prime
-TimeQuest Timing Analyzer. Hasil analisis menunjukkan
-frekuensi maksimum sebesar 86,85~MHz pada clock
-\texttt{h2f\_user0\_clk}, yaitu clock yang digunakan pada
-domain antarmuka HPS--FPGA. Pada jalur timing yang dianalisis,
-diperoleh \emph{worst-case setup slack} sebesar 2,946~ns dan
-\emph{worst-case hold slack} sebesar 0,083~ns. Tidak ditemukan
-pelanggaran setup maupun hold pada jalur yang dianalisis.
-
-Nilai tersebut digunakan sebagai hasil implementasi awal.
-Namun, laporan TimeQuest masih menunjukkan adanya beberapa
-constraint timing yang belum lengkap, khususnya pada sinyal
-clock yang berasal dari antarmuka HPS. Oleh karena itu,
-frekuensi 86,85~MHz belum diperlakukan sebagai hasil
-\emph{timing closure} final. Penyempurnaan constraint clock
-akan dilakukan pada tahap integrasi dan optimasi berikutnya.
-
-\textbf{Pengujian perangkat keras.}
-Setelah proses sintesis dan implementasi, desain diprogramkan
-ke FPGA DE10-Nano untuk memverifikasi fungsi IP secara langsung.
-Pengujian dilakukan dengan memanfaatkan HPS sebagai pihak yang
-menginisiasi transaksi dan FPGA fabric sebagai pihak yang
-menjalankan fungsi keamanan. Sinyal internal yang penting,
-seperti transaksi antarmuka, status proses autentikasi, hasil
-verifikasi, serta kondisi kesalahan, dapat diamati menggunakan
-SignalTap Logic Analyzer.
-
-Pengujian perangkat keras mencakup verifikasi komunikasi
-HPS--FPGA, pembacaan dan penulisan register, pemrosesan
-\emph{challenge--response}, validasi hasil autentikasi, serta
-respons terhadap kondisi kesalahan. Pengujian juga dilakukan
-pada beberapa skenario \emph{corner case} untuk memastikan
-bahwa sistem tidak menghasilkan status autentikasi yang valid
-ketika data masukan tidak sesuai.
-
-\textbf{Analisis daya.}
-Konsumsi daya belum dijadikan sebagai nilai kuantitatif final
-pada tahap implementasi awal. Analisis daya akan dilakukan
-menggunakan Quartus Power Analyzer setelah konfigurasi clock,
-constraint timing, dan aktivitas sinyal telah difinalisasi.
-Parameter yang akan diamati meliputi \emph{static power} dan
-\emph{dynamic power}.
-
-Hasil analisis daya akan digunakan untuk mengevaluasi efisiensi
-implementasi hardware security IP pada FPGA. Selain itu, hasil
-tersebut dapat menjadi data awal untuk memperkirakan
-karakteristik implementasi apabila arsitektur Heketon
-dikembangkan lebih lanjut menuju implementasi ASIC. Estimasi
-ASIC tidak digunakan sebagai klaim performa pada tahap ini
-karena belum dilakukan sintesis dan \emph{place-and-route}
-pada teknologi proses tertentu.
+\textbf{Daya dan versi ASIC.} Di luar autentikasi, hanya \texttt{tamper\_mon} yang aktif dengan clock lambat. Versi ASIC ditargetkan pada proses SkyWater SKY130 (130~nm) dengan area di bawah 0,5~mm\textsuperscript{2} dan daya siaga di bawah 1~mW, jauh lebih kecil daripada pengosongan alami baterai. Daya dan area akan diestimasi dengan Quartus Power Analyzer, Yosys, dan OpenROAD.
 
 \subsection{Strategi Verifikasi}
 
 \begin{itemize}
-  \item \textbf{Verifikasi RTL yang telah dijalankan} --- Testbench C++ dengan Verilator membandingkan SHA-256 terhadap vektor pesan kosong, \texttt{abc}, dan \texttt{hello}; HMAC RTL terhadap RFC 4231 kasus 1 dan referensi Python; serta menguji PUF perilaku dan FSM. Uji integrasi top-level melalui AXI telah memverifikasi autentikasi dengan tag cocok, penolakan tag tidak cocok, dan \emph{zeroize}. Model PUF di tahap ini bersifat deterministik dan tidak memodelkan osilator fisik.
-  \item \textbf{Verifikasi lanjutan} --- Pengujian DE10-Nano, karakterisasi PUF fisik (R1), uji \emph{replay} (R2), skenario basis data identitas (R3), dan pengujian \emph{glitch}/\emph{tamper} (R4) akan dilakukan setelah integrasi board. Statistik, latensi, dan sumber daya akan dilaporkan dari pengukuran aktual; belum ada hasil PUF fisik yang diklaim.
+  \item \textbf{Verifikasi RTL yang telah dijalankan} --- Testbench C++ dengan Verilator membandingkan SHA-256 terhadap vektor pesan kosong, \texttt{abc}, dan \texttt{hello}; HMAC RTL terhadap RFC 4231 kasus 1 dan referensi Python; serta menguji PUF perilaku dan FSM. Uji integrasi top-level melalui AXI telah memverifikasi autentikasi dengan tag cocok, penolakan tag tidak cocok, dan \emph{zeroize}.
+  \item \textbf{Verifikasi lanjutan} --- Pengujian DE10-Nano, karakterisasi PUF fisik (R1), uji \emph{replay} (R2), skenario basis data (R3), serta pengujian \emph{glitch}/\emph{tamper} (R4) akan dilakukan setelah integrasi board. Statistik, latensi, dan sumber daya akan dilaporkan dari pengukuran aktual; belum ada hasil PUF fisik yang diklaim.
 \end{itemize}
 
 % =====================================================================
@@ -511,37 +425,38 @@ pada teknologi proses tertentu.
 \subsection{Model Ancaman}
 
 \begin{center}
-\small
+\footnotesize
 \renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.0cm}|X|>{\raggedright\arraybackslash}p{5.2cm}|}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.3cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{6.6cm}|}
 \hline
-\hdr{Penyerang} & \hdr{Serangan} & \hdr{Penangkal} \\ \hline
-Pemalsu baterai & Menyalin rangkaian atau firmware chip asli & Kunci dari PUF dan tidak tersimpan (R1) \\ \hline
-Pemalsu baterai & Memindahkan chip asli ke pack berisi sel tak standar & Karakteristik sel dicocokkan dengan riwayat ID (R3) \\ \hline
-Penyadap komunikasi & Merekam lalu mengirim ulang respons (\emph{replay}) & \emph{Nonce} acak per penukaran (R2) \\ \hline
-Operator atau bengkel nakal & Memprogram ulang BMS untuk me-\emph{reset} jumlah siklus & Riwayat diambil dari pengukuran stasiun (R3) \\ \hline
-Stasiun palsu atau curang & Mengirim hasil ukur palsu ke basis data & Stasiun diautentikasi. Hasil ukur dicocokkan antarstasiun (R3) \\ \hline
-Penyerang fisik & \emph{Glitch} clock atau membongkar casing & \texttt{tamper\_mon} memicu \emph{zeroize} dan \emph{lock} (R4) \\ \hline
-Penyerang fisik & Mematikan daya untuk membuka \emph{lock} & Basis data memblokir permanen ID yang melapor terkunci \\ \hline
-Penyerang fisik & Memanipulasi \emph{helper data} untuk membocorkan bit kunci & \emph{Helper data} ikut masuk KDF sehingga perubahan menghasilkan kunci salah \\ \hline
+\hdr{Pelaku} & \hdr{Serangan} & \hdr{Cara menangkal} \\ \hline
+Pemalsu baterai & Menyalin chip atau firmware asli & Kunci dari PUF, tidak tersimpan di chip (R1) \\ \hline
+Pemalsu baterai & Memindahkan chip asli ke baterai palsu & Hasil ukur sel dicocokkan dengan riwayat ID (R3) \\ \hline
+Penyadap & Mengirim ulang respons lama & Setiap \emph{nonce} hanya berlaku sekali (R2) \\ \hline
+Bengkel nakal & Mengubah jumlah siklus di BMS & Riwayat dari pengukuran stasiun, bukan BMS (R3) \\ \hline
+Stasiun curang & Mengirim hasil ukur palsu & Dicocokkan dengan data stasiun lain (R3) \\ \hline
+Penyerang fisik & Mengganggu clock atau membuka casing & Kunci dihapus dan chip terkunci (R4) \\ \hline
+Penyerang fisik & Mematikan daya untuk membuka kunci & Basis data memblokir ID yang pernah terkunci \\ \hline
+Penyerang fisik & Mengambil kunci melalui \texttt{ENROLL} & \texttt{ENROLL} tidak ada di chip lapangan \\ \hline
+Penyerang fisik & Mengubah \emph{helper data} & Kunci menjadi salah sehingga respons ditolak \\ \hline
 \end{tabularx}
 \end{center}
 
 \subsection{Prinsip \emph{Security-by-Design}}
 
 \begin{itemize}
-  \item \textbf{Tidak ada rahasia yang tersimpan di perangkat lapangan.} Kunci hanya ada di dalam chip selama satu autentikasi. Satu-satunya salinan berada di HSM milik pihak tepercaya.
-  \item \textbf{Tidak ada jalur baca ke kunci.} Register kunci tidak terhubung ke bus. Mode enrolment hanya dapat dijalankan sekali.
-  \item \textbf{Gagal dengan aman.} Setiap anomali pada clock, casing, atau perintah berakhir pada kunci terhapus dan chip terkunci, tanpa respons yang membocorkan kunci.
-  \item \textbf{Keputusan diambil pihak tepercaya.} Chip tidak memutuskan apa pun. Basis data menerima atau menolak baterai berdasarkan riwayatnya.
+  \item \textbf{Tidak ada kunci di lapangan.} Stasiun dan BMS tidak pernah memegang kunci. Chip hanya membentuk kunci selama satu autentikasi. Salinannya hanya disimpan di HSM pihak tepercaya.
+  \item \textbf{Gangguan berarti terkunci.} Bila chip mendeteksi gangguan, kunci langsung dihapus dan chip berhenti menjawab.
+  \item \textbf{Basis data yang memutuskan.} Chip hanya membuktikan identitas. Keputusan menerima atau menolak baterai diambil basis data berdasarkan riwayatnya.
 \end{itemize}
 
 \subsection{Batasan dan Pengembangan Lanjutan}
 
 \begin{itemize}
-  \item Proteksi \emph{side-channel} (analisis daya~\cite{dpa}) dan uji suhu ekstrem berada di luar cakupan prototipe.
-  \item Pada prototipe FPGA, bitstream diasumsikan tepercaya. Isolasi kunci penuh, penanda \emph{tamper} permanen (OTP/eFuse), dan verifikasi luring berbasis ECC direncanakan untuk versi ASIC.
-  \item Bila PUF belum stabil, demo memakai kunci tetap yang disampaikan terbuka kepada juri.
+  \item \textbf{Belum diuji pada prototipe.} Serangan \emph{side-channel} serta kestabilan PUF terhadap suhu dan penuaan.
+  \item \textbf{Ketergantungan pada HSM.} Kunci simetris membuat salinan kunci di HSM menjadi titik rawan tunggal. Versi ASIC direncanakan menggunakan tanda tangan ECC sehingga basis data cukup menyimpan kunci publik dan verifikasi dapat dilakukan tanpa koneksi.
+  \item \textbf{Keamanan \emph{bitstream}.} Pada prototipe, \emph{bitstream} FPGA diasumsikan tidak diubah pihak lain. Status \emph{lock} juga hilang bila daya diputus sebelum terbaca stasiun. Versi ASIC direncanakan menyimpan status \emph{lock} pada satu bit eFuse.
+  \item \textbf{Rencana cadangan.} Bila PUF belum stabil, demo menggunakan kunci tetap.
 \end{itemize}
 
 % =====================================================================
@@ -550,20 +465,17 @@ Penyerang fisik & Memanipulasi \emph{helper data} untuk membocorkan bit kunci & 
 \vspace{-14pt}
 \begin{thebibliography}{99}\small
 \bibitem{ruptl} PT PLN (Persero), \emph{Rencana Usaha Penyediaan Tenaga Listrik (RUPTL) 2025--2034}, hlm.~II-53--II-54.
-\bibitem{tt07} Tiny Tapeout, \emph{Tiny Tapeout 7 Datasheet}, 2025. github.com/TinyTapeout/tinytapeout-07
 \bibitem{perpres55} Peraturan Presiden RI No.~55 Tahun 2019 tentang Percepatan Program Kendaraan Bermotor Listrik Berbasis Baterai untuk Transportasi Jalan.
 \bibitem{perpres79} Peraturan Presiden RI No.~79 Tahun 2023 tentang Perubahan atas Perpres No.~55 Tahun 2019.
 \bibitem{rukn} Kementerian ESDM, \emph{Rencana Umum Ketenagalistrikan Nasional (RUKN)}, Kepmen ESDM No.~85.K/TL.01/MEM.L/2025, hlm.~51.
+\bibitem{eubat} Regulation (EU) 2023/1542 of the European Parliament and of the Council of 12 July 2023 concerning batteries and waste batteries.
 \bibitem{barel} H. Bar-El \emph{et al.}, ``The Sorcerer's Apprentice Guide to Fault Attacks,'' \emph{Proceedings of the IEEE}, vol.~94, no.~2, 2006.
 \bibitem{suh} G. E. Suh and S. Devadas, ``Physical Unclonable Functions for Device Authentication and Secret Key Generation,'' \emph{Proc. Design Automation Conference (DAC)}, 2007.
 \bibitem{maes} R. Maes, \emph{Physically Unclonable Functions: Constructions, Properties and Applications}, Springer, 2013.
-\bibitem{fips198} NIST, \emph{FIPS 198-1: The Keyed-Hash Message Authentication Code (HMAC)}, 2008.
-\bibitem{fips180} NIST, \emph{FIPS 180-4: Secure Hash Standard (SHS)}, 2015.
-\bibitem{dodis} Y. Dodis, L. Reyzin, and A. Smith, ``Fuzzy Extractors: How to Generate Strong Keys from Biometrics and Other Noisy Data,'' \emph{EUROCRYPT}, 2004.
-\bibitem{de10} Terasic, \emph{DE10-Nano User Manual}.
+\bibitem{bq26100} Texas Instruments, \emph{bq26100: SHA-1/HMAC Based Security and Authentication IC with SDQ Interface}, datasheet.
+\bibitem{ds28e38} Analog Devices, \emph{DS28E38: DeepCover Secure ECDSA Authenticator with ChipDNA PUF Protection}, datasheet.
+\bibitem{tt07} Tiny Tapeout, \emph{Tiny Tapeout 7 Datasheet}, 2025. github.com/TinyTapeout/tinytapeout-07
 \bibitem{peruri} PERURI, \emph{Peruri Chip Design Datasheet}, chip.peruri.co.id/datasheet.pdf
-\bibitem{rfc4231} M. Nystrom, \emph{RFC 4231: Identifiers and Test Vectors for HMAC-SHA-224, -256, -384, and -512}, IETF, 2005.
-\bibitem{dpa} P. Kocher, J. Jaffe, and B. Jun, ``Differential Power Analysis,'' \emph{CRYPTO}, 1999.
 \end{thebibliography}
 
 % =====================================================================
@@ -571,50 +483,61 @@ Penyerang fisik & Memanipulasi \emph{helper data} untuk membocorkan bit kunci & 
 \section*{Lampiran Teknis}
 
 \begin{itemize}
-  \item Repositori proyek (RTL, testbench, model Python, dokumentasi): \todo{tautan GitHub, atur akses bila perlu dibagikan ke juri}.
+  \item Repositori proyek (RTL, testbench, model Python, dokumentasi): \url{https://github.com/Grsliy/Heketon-bang}.
+  \item Hasil awal model referensi Python (perangkat lunak, kunci tetap): lolos 2 vektor uji SHA-256 FIPS 180-4, 6 vektor uji HMAC-SHA-256 RFC 4231, dan 7 skenario protokol (baterai asli diterima, kloning, \emph{replay}, \emph{helper data} palsu, \emph{tamper}, dan kapasitas tidak wajar ditolak).
   \item Perangkat lunak: Intel Quartus Prime Standard (sintesis, timing, LogicLock, SignalTap), Platform Designer, Verilator, dan Python. Yosys/OpenROAD dengan SkyWater SKY130 PDK merupakan opsi untuk pengembangan ASIC.
-  \item Register map, termasuk register tag autentikasi dan status \emph{zeroize}, serta spesifikasi perintah akan dilengkapi pada laporan teknis.
+  \item Register map, termasuk register tag autentikasi pada alamat 0x80--0x9C dan status \emph{zeroize}, akan dilengkapi pada laporan teknis.
 \end{itemize}
 
 \section*{Tim \& Pembagian Peran}
 
 \begin{center}
 \small
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.6cm}|>{\raggedright\arraybackslash}p{3.6cm}|X|}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{4.0cm}|>{\raggedright\arraybackslash}p{3.0cm}|X|}
 \hline
-\hdr{Nama Anggota} & \hdr{Keahlian Utama} & \hdr{Tanggung Jawab \& Peran} \\ \hline
-Guntur Sulistyo (Ketua) & Security / Safety Analyst & Model ancaman, desain \texttt{tamper\_mon} dan respons \emph{fail-secure}, skenario serangan dan \emph{fault injection}, karakterisasi PUF, koordinasi tim. \\ \hline
-Dimas Eryan Ahnaf Fahrezi & System / Business Analyst & Kebutuhan sistem ekosistem SPBKLU, protokol enrolment, emulasi stasiun dan basis data (Python), dokumentasi dan presentasi. \\ \hline
-Muhammad Muqtada Alhaddad & RTL Designer / Verilog & Integrasi SHA-256 TT07 dan HMAC, \texttt{ro\_puf}, \texttt{fuzzy\_ext}, \texttt{auth\_ctrl}, integrasi HPS--FPGA, sintesis dan \emph{timing}. \\ \hline
+\hdr{Nama} & \hdr{Peran} & \hdr{Tanggung jawab} \\ \hline
+Guntur Sulistyo\newline{\footnotesize\color{subtle}Ketua} & Keamanan dan koordinasi & Model ancaman, desain \texttt{tamper\_mon}, uji serangan (\emph{replay}, \emph{glitch} clock, pembukaan casing), karakterisasi PUF, dan koordinasi tim. \\ \hline
+Muhammad Muqtada Alhaddad & Perancang RTL & Seluruh modul RTL (\texttt{bus\_if}, \texttt{auth\_ctrl}, \texttt{ro\_puf}, \texttt{fuzzy\_ext}, \texttt{key\_vault}, \texttt{hmac\_sha256}), sintesis, \emph{timing closure}, dan porting ke DE10-Nano. \\ \hline
+Dimas Eryan Ahnaf Fahrezi & Sistem dan verifikasi & Model referensi Python, \emph{testbench} C++/Verilator, emulasi stasiun dan basis data identitas, protokol enrolment, serta dokumentasi dan presentasi. \\ \hline
+Ir. Agus Bejo, S.T., M.Eng., D.Eng., IPM & Dosen pembimbing & Arahan teknis dan tinjauan desain. \\ \hline
 \end{tabularx}
 \end{center}
 
-\section*{Luaran \& Demo (Opsional)}
+\section*{Luaran \& Demo}
+
+Luaran berikut direncanakan untuk tahap bootcamp dan final. Verifikasi RTL awal telah berjalan; demonstrasi dan karakterisasi pada DE10-Nano masih direncanakan.
 
 \field{Demo Live:}
-Pada DE10-Nano, dua ``baterai'' (dua lokasi PUF berbeda) diuji oleh dua stasiun emulasi yang memakai satu basis data. Baterai asli diterima di kedua stasiun, kloningan ditolak, respons lama (\emph{replay}) ditolak, dan \emph{glitch} clock atau pembukaan ``casing'' membuat chip terkunci dengan indikator LED, lalu ID-nya diblokir basis data.
+Demo direncanakan berjalan di DE10-Nano dengan dua ``baterai'' (dua lokasi PUF berbeda), dua stasiun emulasi, dan satu basis data identitas. Empat skenario akan ditunjukkan.
+\begin{itemize}
+  \item Baterai asli diterima di kedua stasiun.
+  \item Baterai kloning ditolak.
+  \item Respons lama yang dikirim ulang (\emph{replay}) ditolak.
+  \item \emph{Glitch} clock atau pembukaan ``casing'' membuat chip terkunci dengan indikator LED, lalu ID-nya diblokir basis data.
+\end{itemize}
 
 \field{Video Demo:}
-Video 3--5 menit: masalah baterai palsu, pembagian peran chip, stasiun, dan basis data, arsitektur chip, dan skenario serangan.
+Video 3--5 menit akan berisi masalah baterai palsu, cara kerja chip bersama stasiun dan basis data, serta keempat skenario demo. Video ini juga disiapkan sebagai cadangan bila board bermasalah saat demo langsung.
 
 \field{Repository Source Code:}
-RTL SystemVerilog, testbench C++/Verilator, referensi Python, emulasi stasiun dan basis data, proyek Quartus/Platform Designer, skrip karakterisasi PUF, dan bitstream (.sof/.rbf) setelah validasi board.
+Repositori akan memuat RTL SystemVerilog, \emph{testbench} C++/Verilator, model referensi Python, emulasi stasiun dan basis data, proyek Quartus, skrip karakterisasi PUF, dan \emph{bitstream}.
 
 \field{Laporan Teknis Singkat:}
-Spesifikasi arsitektur dan register map, hasil sintesis/timing/resource/daya, statistik PUF (keunikan dan reliabilitas), latensi autentikasi, dan hasil uji serangan terhadap R1--R5.
+Laporan akan memuat hasil pengukuran terhadap target R1--R5, yaitu statistik PUF (keunikan dan reliabilitas), latensi autentikasi, hasil sintesis (sumber daya, \emph{timing}, dan daya), serta hasil uji serangan. Laporan juga dilengkapi spesifikasi arsitektur dan \emph{register map}.
 
-\section*{Rencana Bootcamp (3 Hari) (Opsional)}
+\section*{Rencana Bootcamp (3 Hari)}
 
-\field{Jadwal \& Target Eksekusi:} Jalur kritis dibangun dengan kunci tetap terlebih dahulu sehingga demo selalu dapat berjalan. PUF kemudian menggantikan kunci tetap.
+\field{Jadwal \& Target Eksekusi:} RTL akan diuji lebih dulu pada FPGA milik tim sebelum bootcamp (Bagian~4.3). Bootcamp digunakan untuk memindahkan desain ke DE10-Nano dan mengukur target R1--R5. Jalur kritis dengan kunci tetap dikerjakan lebih dulu sehingga demo selalu dapat berjalan.
 
 \begin{center}
 \small
-\begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}p{1.6cm}|>{\raggedright\arraybackslash}p{4.4cm}|X|}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}p{4.0cm}|X|}
 \hline
 \hdr{Hari} & \hdr{Fokus Kegiatan} & \hdr{Target Deliverables} \\ \hline
-\textbf{Hari 1} & Jalur kritis dengan kunci tetap & HMAC-SHA-256 lolos vektor uji di board. FSM autentikasi terhubung ke HPS. Emulasi stasiun dan basis data dapat menerima atau menolak baterai. \\ \hline
-\textbf{Hari 2} & Kunci dari PUF & \texttt{ro\_puf} + \emph{fuzzy extractor} menggantikan kunci tetap. Statistik reliabilitas dan keunikan (R1) serta resource dan timing terukur. \\ \hline
-\textbf{Hari 3} & Keamanan \& demo & \texttt{tamper\_mon} dengan \emph{zeroize} dan \emph{lock} aktif (R4). Skenario serangan lengkap, video demo, laporan teknis, dan materi presentasi siap. \\ \hline
+\textbf{Hari 1} & Pindah ke DE10-Nano dengan kunci tetap & HMAC lolos vektor uji di board. Emulasi stasiun dan basis data di HPS dapat menerima atau menolak baterai. Uji \emph{replay} (R2). \\ \hline
+\textbf{Hari 2} & Kunci dari PUF & \texttt{ro\_puf} dan \texttt{fuzzy\_ext} menggantikan kunci tetap. Keunikan dan reliabilitas PUF (R1), sumber daya, dan \emph{timing} (R5) terukur. \\ \hline
+\textbf{Hari 3} & Uji serangan dan finalisasi & \emph{Glitch} clock dan pembukaan casing memicu hapus kunci dan \emph{lock} (R4). Skenario riwayat dan pemblokiran ID (R3). Video demo, laporan teknis, dan slide siap. \\ \hline
 \end{tabularx}
 \end{center}
 
