@@ -490,10 +490,12 @@ Ir. Agus Bejo, S.T., M.Eng., D.Eng., IPM & Dosen pembimbing & Arahan teknis dan 
 \end{tabularx}
 \end{center}
 
-\section*{Luaran \& Demo (Opsional)}
+\section*{Luaran \& Demo}
+
+Luaran berikut direncanakan untuk tahap bootcamp dan final. Hingga proposal ini dikirim, desain masih berada pada tahap perancangan.
 
 \field{Demo Live:}
-Demo berjalan di DE10-Nano dengan dua ``baterai'' (dua lokasi PUF berbeda), dua stasiun emulasi, dan satu basis data identitas. Empat skenario ditunjukkan.
+Demo direncanakan berjalan di DE10-Nano dengan dua ``baterai'' (dua lokasi PUF berbeda), dua stasiun emulasi, dan satu basis data identitas. Empat skenario akan ditunjukkan.
 \begin{itemize}
   \item Baterai asli diterima di kedua stasiun.
   \item Baterai kloning ditolak.
@@ -502,26 +504,27 @@ Demo berjalan di DE10-Nano dengan dua ``baterai'' (dua lokasi PUF berbeda), dua 
 \end{itemize}
 
 \field{Video Demo:}
-Video 3--5 menit berisi masalah baterai palsu, cara kerja chip bersama stasiun dan basis data, serta keempat skenario demo. Video ini juga menjadi cadangan bila board bermasalah saat demo langsung.
+Video 3--5 menit akan berisi masalah baterai palsu, cara kerja chip bersama stasiun dan basis data, serta keempat skenario demo. Video ini juga disiapkan sebagai cadangan bila board bermasalah saat demo langsung.
 
 \field{Repository Source Code:}
-RTL Verilog, \emph{testbench} cocotb, model referensi Python, emulasi stasiun dan basis data, proyek Quartus, skrip karakterisasi PUF, dan \emph{bitstream}.
+Repositori akan memuat RTL Verilog, \emph{testbench} cocotb, model referensi Python, emulasi stasiun dan basis data, proyek Quartus, skrip karakterisasi PUF, dan \emph{bitstream}.
 
 \field{Laporan Teknis Singkat:}
-Hasil pengukuran terhadap target R1--R5, yaitu statistik PUF (keunikan dan reliabilitas), latensi autentikasi, hasil sintesis (sumber daya, \emph{timing}, dan daya), serta hasil uji serangan. Laporan dilengkapi spesifikasi arsitektur dan \emph{register map}.
+Laporan akan memuat hasil pengukuran terhadap target R1--R5, yaitu statistik PUF (keunikan dan reliabilitas), latensi autentikasi, hasil sintesis (sumber daya, \emph{timing}, dan daya), serta hasil uji serangan. Laporan juga dilengkapi spesifikasi arsitektur dan \emph{register map}.
 
-\section*{Rencana Bootcamp (3 Hari) (Opsional)}
+\section*{Rencana Bootcamp (3 Hari)}
 
-\field{Jadwal \& Target Eksekusi:} Jalur kritis dibangun dengan kunci tetap terlebih dahulu sehingga demo selalu dapat berjalan. PUF kemudian menggantikan kunci tetap.
+\field{Jadwal \& Target Eksekusi:} RTL akan diuji lebih dulu pada FPGA milik tim sebelum bootcamp (Bagian~4.3). Bootcamp digunakan untuk memindahkan desain ke DE10-Nano dan mengukur target R1--R5. Jalur kritis dengan kunci tetap dikerjakan lebih dulu sehingga demo selalu dapat berjalan.
 
 \begin{center}
 \small
-\begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}p{1.6cm}|>{\raggedright\arraybackslash}p{4.4cm}|X|}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}p{4.0cm}|X|}
 \hline
 \hdr{Hari} & \hdr{Fokus Kegiatan} & \hdr{Target Deliverables} \\ \hline
-\textbf{Hari 1} & Jalur kritis dengan kunci tetap & HMAC-SHA-256 lolos vektor uji di board. FSM autentikasi terhubung ke HPS. Emulasi stasiun dan basis data dapat menerima atau menolak baterai. \\ \hline
-\textbf{Hari 2} & Kunci dari PUF & \texttt{ro\_puf} + \emph{fuzzy extractor} menggantikan kunci tetap. Statistik reliabilitas dan keunikan (R1) serta resource dan timing terukur. \\ \hline
-\textbf{Hari 3} & Keamanan \& demo & \texttt{tamper\_mon} dengan \emph{zeroize} dan \emph{lock} aktif (R4). Skenario serangan lengkap, video demo, laporan teknis, dan materi presentasi siap. \\ \hline
+\textbf{Hari 1} & Pindah ke DE10-Nano dengan kunci tetap & HMAC lolos vektor uji di board. Emulasi stasiun dan basis data di HPS dapat menerima atau menolak baterai. Uji \emph{replay} (R2). \\ \hline
+\textbf{Hari 2} & Kunci dari PUF & \texttt{ro\_puf} dan \texttt{fuzzy\_ext} menggantikan kunci tetap. Keunikan dan reliabilitas PUF (R1), sumber daya, dan \emph{timing} (R5) terukur. \\ \hline
+\textbf{Hari 3} & Uji serangan dan finalisasi & \emph{Glitch} clock dan pembukaan casing memicu hapus kunci dan \emph{lock} (R4). Skenario riwayat dan pemblokiran ID (R3). Video demo, laporan teknis, dan slide siap. \\ \hline
 \end{tabularx}
 \end{center}
 
