@@ -247,7 +247,7 @@ IC berbasis PUF\newline{\footnotesize\color{subtle}contoh: DS28E38} & \cmark & \
 \end{tabularx}
 \end{center}
 
-IC autentikasi komersial tahan kloning dan serangan fisik. Sebagian menyimpan kunci di memori yang diisi melalui rantai \emph{provisioning} vendor~\cite{bq26100}. IC lain seperti DS28E38 menurunkan kunci privat ECDSA dari PUF sehingga kunci tidak tersimpan~\cite{ds28e38}. Kedua jenis IC tersebut merupakan desain tertutup, sehingga pihak tepercaya tidak dapat memeriksa cara kunci dibangkitkan. Usulan ini menggunakan prinsip PUF yang serupa. Pembedanya adalah rancangan RTL yang dibangun dari \emph{baseline} terbuka sehingga dapat diperiksa, serta integrasi dengan basis data identitas lintas operator.
+IC komersial sudah tahan kloning dan serangan fisik, baik yang menyimpan kunci di memori~\cite{bq26100} maupun yang menurunkan kunci dari PUF seperti DS28E38~\cite{ds28e38}. Namun, keduanya berdesain tertutup sehingga pihak tepercaya tidak dapat memeriksa cara kunci dibangkitkan. Pembeda usulan ini adalah RTL terbuka yang dapat diperiksa dan integrasi dengan basis data identitas lintas operator.
 
 \subsection{Rumusan Masalah dan Kebutuhan Desain}
 
