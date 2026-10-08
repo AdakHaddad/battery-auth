@@ -138,7 +138,7 @@
 {\color{secline}\rule{2.4cm}{3pt}\par}
 \vspace{14pt}
 \begin{minipage}{0.86\linewidth}
-{\fontsize{15}{20}\selectfont\color{ink!80}\raggedright\hyphenpenalty=10000 Chip keamanan yang membuktikan keaslian baterai di stasiun tukar baterai kendaraan listrik, dengan kunci dari sidik jari silikon (PUF) yang tidak pernah disimpan\par}
+{\fontsize{15}{20}\selectfont\color{ink!80}\raggedright\hyphenpenalty=10000 Chip keamanan yang membuktikan keaslian baterai di stasiun tukar baterai kendaraan listrik, dengan kunci dari sidik jari silikon (PUF) yang tidak disimpan di chip\par}
 \end{minipage}
 
 
@@ -165,7 +165,7 @@
 
 Setiap hari, pengendara motor listrik menukar baterai kosong dengan baterai penuh di stasiun penukaran baterai (SPBKLU). Baterai tersebut merupakan aset bersama yang berpindah dari satu pengendara ke pengendara lain dan dapat melewati beberapa operator dengan sistem yang berbeda. Saat menerima sebuah baterai, stasiun hanya dapat membaca data yang dilaporkan baterai itu sendiri sehingga keaslian dan catatan pemakaiannya tidak dapat dibuktikan. Baterai palsu atau bekas yang dirakit ulang tanpa standar dapat lolos ke jaringan dan berisiko memicu kebakaran. Jumlah siklus pemakaian juga dapat diubah agar baterai tua tampak baru, seperti odometer mobil bekas yang diputar mundur. Kedua celah ini makin luas seiring bertambahnya motor listrik, yang pada akhir 2024 telah mencapai sekitar 168 ribu unit~\cite{ruptl}.
 
-Kami mengusulkan Secure Battery Identity Chip, chip keamanan kecil yang ditanam di dalam setiap baterai. Kami merancang chip ini untuk membaca ``sidik jari'' alami dari variasi fabrikasi silikonnya dan menurunkan kunci dari sidik jari tersebut setiap kali dibutuhkan. Kunci tidak pernah disimpan, sehingga tidak ada kunci di memori yang dapat dibaca atau disalin. Saat baterai masuk, basis data identitas mengirim angka acak sekali pakai (\emph{nonce}) yang hanya dapat dijawab oleh chip asli (Gambar~\ref{fig:konsep}). Catatan pemakaian berasal dari pengukuran stasiun saat mengisi daya dan disimpan di basis data identitas yang dikelola lembaga penjamin keaslian. Jika chip mendeteksi pembongkaran atau gangguan listrik, chip berhenti menjawab dan basis data memblokir identitasnya secara permanen.
+Kami mengusulkan Secure Battery Identity Chip, chip keamanan kecil yang ditanam di dalam setiap baterai. Kami merancang chip ini untuk membaca ``sidik jari'' alami dari variasi fabrikasi silikonnya dan menurunkan kunci dari sidik jari tersebut setiap kali dibutuhkan. Kunci tidak pernah disimpan di dalam chip, sehingga tidak ada kunci di memori chip yang dapat dibaca atau disalin. Saat baterai masuk, basis data identitas mengirim angka acak sekali pakai (\emph{nonce}) yang hanya dapat dijawab oleh chip asli (Gambar~\ref{fig:konsep}). Catatan pemakaian berasal dari pengukuran stasiun saat mengisi daya dan disimpan di basis data identitas yang dikelola lembaga penjamin keaslian. Jika chip mendeteksi pembongkaran atau gangguan listrik, chip berhenti menjawab dan basis data memblokir identitasnya secara permanen.
 
 \begin{figure}[H]
 \centering
@@ -217,7 +217,7 @@ Percepatan kendaraan bermotor listrik berbasis baterai diatur melalui Perpres No
 
 \subsection{Tiga Masalah Inti}
 
-Baterai tukar berperilaku seperti dokumen berharga yang terus berpindah tangan. Keaslian dan riwayatnya harus dapat dibuktikan setiap kali berpindah, dengan pemeriksaan elektronik di setiap stasiun. Tiga masalah muncul dari kebutuhan tersebut.
+Seperti dokumen berharga, baterai tukar terus berpindah tangan. Karena itu, keaslian dan riwayatnya perlu dibuktikan secara elektronik di setiap stasiun yang menerimanya. Tiga masalah muncul dari kebutuhan tersebut.
 
 \begin{enumerate}[label=\textbf{P\arabic*.}, leftmargin=2.2em]
   \item \textbf{Keaslian baterai tidak dapat dibuktikan secara independen.} Nomor seri, label, dan kode QR mudah disalin, sedangkan autentikasi milik operator hanya berlaku di jaringannya sendiri. Pihak yang mencari keuntungan dapat menyerahkan baterai palsu di stasiun dan membawa pulang baterai asli. Operator kehilangan aset, sedangkan pengendara berikutnya menerima baterai dengan sel yang berisiko mengalami \emph{thermal runaway}.
@@ -234,17 +234,18 @@ Identitas baterai tidak dapat diserahkan kepada perangkat lunak. Pihak yang ingi
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|*{5}{>{\centering\arraybackslash}p{1.65cm}|}}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|*{6}{>{\centering\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{1.55cm}|}}
 \hline
-\hdr{Pendekatan} & \hdr{Tahan kloning} & \hdr{Tahan serangan fisik} & \hdr{Kunci tidak tersimpan} & \hdr{Enrolment pihak netral} & \hdr{Dapat diaudit} \\ \hline
-Nomor seri, label, kode QR & \xmark & \xmark & -- & \pmark & \cmark \\ \hline
-Kunci di firmware BMS & \xmark & \xmark & \xmark & \xmark & \pmark \\ \hline
-IC autentikasi baterai komersial & \cmark & \cmark & \xmark & \pmark & \xmark \\ \hline
-\textbf{Usulan} & \cmark & \pmark & \cmark & \cmark & \cmark \\ \hline
+\hdr{Pendekatan} & \hdr{Tahan kloning} & \hdr{Tahan serangan fisik} & \hdr{Kunci tidak tersimpan di chip} & \hdr{Desain dapat diperiksa} & \hdr{Enrolment pihak tepercaya} & \hdr{Basis data lintas operator} \\ \hline
+Nomor seri, label, kode QR & \xmark & \xmark & -- & \cmark & \pmark & \pmark \\ \hline
+Kunci di firmware BMS & \xmark & \xmark & \xmark & \pmark & \xmark & \xmark \\ \hline
+IC kunci tersimpan (TI bq, OPTIGA) & \cmark & \cmark & \xmark & \xmark & \pmark & \xmark \\ \hline
+IC berbasis PUF (DS28E38) & \cmark & \cmark & \cmark & \xmark & \cmark & \xmark \\ \hline
+\textbf{Usulan} (target desain) & \cmark & \pmark & \cmark & \cmark & \cmark & \cmark \\ \hline
 \end{tabularx}
 \end{center}
 
-IC autentikasi baterai komersial tahan kloning dan serangan fisik. Namun, kuncinya ditanam ke memori chip melalui rantai \emph{provisioning} vendor, sehingga pihak netral sulit melakukan enrolment atau mengaudit akar kepercayaannya tanpa melibatkan vendor. Pada usulan ini, kunci diturunkan dari PUF dan tidak pernah ditanam ke chip. Enrolment dapat dilakukan di bawah pengawasan lembaga penjamin keaslian. Desain chip juga dapat diperiksa karena dibangun dari baseline terbuka.
+IC autentikasi komersial tahan kloning dan serangan fisik. Sebagian menyimpan kunci di memori yang diisi melalui rantai \emph{provisioning} vendor~\cite{bq26100}. IC lain seperti DS28E38 menurunkan kunci privat ECDSA dari PUF sehingga kunci tidak tersimpan~\cite{ds28e38}. Kedua jenis IC tersebut merupakan desain tertutup, sehingga pihak tepercaya tidak dapat memeriksa cara kunci dibangkitkan. Usulan ini menggunakan prinsip PUF yang serupa. Pembedanya adalah rancangan RTL yang dibangun dari \emph{baseline} terbuka sehingga dapat diperiksa, serta integrasi dengan basis data identitas lintas operator.
 
 \subsection{Rumusan Masalah dan Kebutuhan Desain}
 
@@ -416,7 +417,7 @@ Penyerang fisik & Memanipulasi \emph{helper data} & \emph{Helper data} masuk KDF
 
 \begin{itemize}
   \item Proteksi \emph{side-channel}~\cite{dpa}, keandalan PUF pada rentang suhu \emph{pack}, dan penuaan di luar cakupan prototipe.
-  \item Pada prototipe, \emph{bitstream} diasumsikan tepercaya. Versi ASIC direncanakan memiliki eFuse dan tanda tangan ECC untuk verifikasi luring, yang juga mengurangi ketergantungan pada HSM.
+  \item Pada prototipe, \emph{bitstream} diasumsikan tepercaya. Salinan kunci simetris di HSM menjadikan basis data titik rawan tunggal. Versi ASIC direncanakan memiliki eFuse dan tanda tangan ECC sehingga basis data cukup menyimpan kunci publik dan verifikasi dapat dilakukan luring.
   \item Bila PUF belum stabil, demo menggunakan kunci tetap yang disampaikan terbuka kepada juri.
 \end{itemize}
 
@@ -434,6 +435,8 @@ Penyerang fisik & Memanipulasi \emph{helper data} & \emph{Helper data} masuk KDF
 \bibitem{barel} H. Bar-El \emph{et al.}, ``The Sorcerer's Apprentice Guide to Fault Attacks,'' \emph{Proceedings of the IEEE}, vol.~94, no.~2, 2006.
 \bibitem{suh} G. E. Suh and S. Devadas, ``Physical Unclonable Functions for Device Authentication and Secret Key Generation,'' \emph{Proc. Design Automation Conference (DAC)}, 2007.
 \bibitem{maes} R. Maes, \emph{Physically Unclonable Functions: Constructions, Properties and Applications}, Springer, 2013.
+\bibitem{bq26100} Texas Instruments, \emph{bq26100: SHA-1/HMAC Based Security and Authentication IC with SDQ Interface}, datasheet.
+\bibitem{ds28e38} Analog Devices, \emph{DS28E38: DeepCover Secure ECDSA Authenticator with ChipDNA PUF Protection}, datasheet.
 \bibitem{fips198} NIST, \emph{FIPS 198-1: The Keyed-Hash Message Authentication Code (HMAC)}, 2008.
 \bibitem{fips180} NIST, \emph{FIPS 180-4: Secure Hash Standard (SHS)}, 2015.
 \bibitem{dodis} Y. Dodis, L. Reyzin, and A. Smith, ``Fuzzy Extractors: How to Generate Strong Keys from Biometrics and Other Noisy Data,'' \emph{EUROCRYPT}, 2004.
