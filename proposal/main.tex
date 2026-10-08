@@ -191,7 +191,7 @@ Kami mengusulkan Secure Battery Identity Chip, chip keamanan kecil yang ditanam 
 \label{fig:konsep}
 \end{figure}
 
-Riwayat di basis data tersebut hanya bermakna apabila setiap baterai memiliki identitas yang tidak dapat dipalsukan, karena tanpa identitas tersebut riwayat baterai asli dapat ditempelkan pada baterai palsu. Identitas ini harus diwujudkan sebagai chip di dalam baterai, satu-satunya komponen yang ikut berpindah bersama baterai dan dapat dirancang untuk menahan serangan fisik. Setiap blok chip dirancang untuk menangkal ancaman tertentu.
+Riwayat tersebut hanya bermakna apabila identitas baterai tidak dapat dipalsukan. Karena itu, identitas diwujudkan sebagai chip di dalam baterai, satu-satunya komponen yang ikut berpindah bersama baterai dan dapat dirancang untuk menahan serangan fisik.
 
 \begin{center}
 \small
@@ -346,8 +346,6 @@ Status \emph{lock} & 1 bit & Publik & Register di dalam chip & Selama chip berda
 \end{tabularx}
 \end{center}
 
-Chip tidak memiliki memori non-volatil untuk data. Antarmuka ke host berupa AXI-Lite pada prototipe FPGA dan I\textsuperscript{2}C/SMBus pada ASIC, ditambah satu input sakelar casing dan satu output penanda \emph{lock}.
-
 \subsection{Alur Operasi}
 
 \begin{enumerate}
@@ -355,7 +353,7 @@ Chip tidak memiliki memori non-volatil untuk data. Antarmuka ke host berupa AXI-
   \item \textbf{Verifikasi} --- dilakukan pada setiap penukaran baterai. Stasiun meneruskan \emph{nonce} dari basis data identitas ke chip. Chip menjawab dengan respons HMAC$(K, \text{nonce}\,\|\,\text{ID})$. Basis data memeriksa respons tersebut bersama hasil ukur sel, memperbarui riwayat, lalu menjawab \emph{valid} atau \emph{tidak valid}. Stasiun tidak pernah memegang kunci.
 \end{enumerate}
 
-Status chip berurutan dari BOOT ke IDLE, lalu AUTH, lalu kembali ke IDLE. Saat \texttt{tamper\_mon} mendeteksi anomali, chip berpindah ke LOCK dari status mana pun. Status LOCK bersifat volatil, tetapi chip terus mendapat daya dari sel sehingga stasiun berikutnya membacanya dan basis data memblokir ID tersebut.
+Chip yang terkunci tetap mendapat daya dari sel, sehingga statusnya terbaca oleh stasiun berikutnya dan basis data memblokir ID tersebut.
 
 % =====================================================================
 \section{Technical Design}
@@ -382,7 +380,7 @@ Status chip berurutan dari BOOT ke IDLE, lalu AUTH, lalu kembali ke IDLE. Saat \
 
 \textbf{Prototipe FPGA.} Logika chip dijalankan pada bagian FPGA (Cyclone~V) di DE10-Nano. Prosesor ARM (HPS) pada board yang sama berperan sebagai BMS, stasiun, dan basis data identitas yang diemulasikan dengan Python. Karena antarmukanya sederhana dan tanpa NVM, desain ini juga dapat dipasang sebagai blok tambahan pada baseline chip penyelenggara~\cite{peruri}.
 
-\begin{table}[!t]
+\begin{table}[!b]
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
