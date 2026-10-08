@@ -169,10 +169,10 @@ Riwayat di basis data tersebut hanya bermakna apabila setiap baterai memiliki id
 \renewcommand{\arraystretch}{1.12}
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.1cm}|X|}
 \hline
-\hdr{Chip yang dirancang} & \emph{Secure element} tanpa memori non-volatil berisi \emph{Ring-Oscillator PUF} dengan \emph{fuzzy extractor}, HMAC-SHA-256 berbasis baseline TT07~\cite{tt07}, FSM \emph{challenge--response}, dan monitor \emph{tamper}. Target ASIC SKY130. \\ \hline
+\hdr{Arsitektur target} & \emph{Secure element} tanpa memori non-volatil dengan identitas berbasis PUF, HMAC-SHA-256, FSM \emph{challenge--response}, dan respons \emph{tamper}. RO-PUF fisik, \emph{fuzzy extractor}, monitor \emph{tamper}, dan implementasi ASIC SKY130 merupakan target pengembangan; prototipe RTL saat ini memakai PUF perilaku deterministik. \\ \hline
 \hdr{Target pengguna} & Operator stasiun dan penyedia sewa baterai (pemeriksa), produsen baterai dan BMS (pemasang chip), serta lembaga penjamin keaslian (pengelola basis data identitas). Adopsi dapat didorong melalui standar identitas baterai. \\ \hline
 \hdr{Dampak} & Baterai yang tidak dikenal ditolak sebelum diserahkan (keselamatan). Nilai sisa dan garansi ditentukan dari riwayat yang tepercaya (ekonomi). Akar kepercayaan dirancang di dalam negeri (kemandirian). \\ \hline
-\hdr{Demo prototipe} & FPGA DE10-Nano. Baterai asli diterima, kloningan dan respons lama ditolak, serta pembongkaran membuat identitas diblokir (target R1--R5). \\ \hline
+\hdr{Status prototipe} & Simulasi RTL dengan Verilator telah menguji SHA-256, HMAC-SHA-256, FSM, autentikasi valid/tidak valid, dan \emph{zeroize}. Validasi pada DE10-Nano, PUF fisik, uji \emph{replay}, dan deteksi pembongkaran masih direncanakan. \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -346,6 +346,18 @@ Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS ya
 \end{tabularx}
 \end{center}
 
+\subsection{Status Implementasi dan Hasil Verifikasi Awal}
+
+Verifikasi awal dilakukan melalui simulasi RTL dengan Verilator.
+SHA-256 cocok dengan vektor uji pesan kosong, \texttt{abc}, dan
+\texttt{hello}. HMAC-SHA-256 pada RTL cocok dengan RFC 4231 kasus 1
+terhadap referensi Python, dan uji integrasi AXI memverifikasi tag valid,
+penolakan tag tidak valid, serta penghapusan state sensitif melalui
+\emph{zeroize}. PUF pada simulasi adalah model LFSR deterministik untuk
+menguji antarmuka dan reproduksibilitas respons; model ini tidak
+merepresentasikan perilaku osilator fisik. Belum ada hasil pengukuran
+PUF fisik atau validasi pada board yang diklaim.
+
 \subsection{Implementasi, Sumber Daya, dan Daya}
 
 \textbf{Prototipe FPGA.}
@@ -489,8 +501,8 @@ pada teknologi proses tertentu.
 \subsection{Strategi Verifikasi}
 
 \begin{itemize}
-  \item \textbf{Simulasi dengan cocotb dan Verilator} --- SHA-256 dan HMAC dibandingkan bit per bit dengan model Python menggunakan vektor uji FIPS 180-4 dan RFC 4231~\cite{rfc4231}. FSM diuji untuk semua perintah, \emph{nonce} berulang, dan perilaku \emph{lock}. \emph{Fuzzy extractor} diuji dengan injeksi derau bit, sedangkan \emph{fault injection} memastikan chip berakhir dalam keadaan aman.
-  \item \textbf{Pengujian di board} --- mencakup \emph{timing closure}, karakterisasi PUF (R1) pada beberapa lokasi penempatan RO, uji \emph{replay} (R2), skenario basis data identitas (R3), serta \emph{glitch} clock melalui rekonfigurasi PLL dan pin \emph{tamper} (R4). SignalTap hanya digunakan pada \emph{build} pengembangan.
+  \item \textbf{Verifikasi RTL yang telah dijalankan} --- Testbench C++ dengan Verilator membandingkan SHA-256 terhadap vektor pesan kosong, \texttt{abc}, dan \texttt{hello}; HMAC RTL terhadap RFC 4231 kasus 1 dan referensi Python; serta menguji PUF perilaku dan FSM. Uji integrasi top-level melalui AXI telah memverifikasi autentikasi dengan tag cocok, penolakan tag tidak cocok, dan \emph{zeroize}. Model PUF di tahap ini bersifat deterministik dan tidak memodelkan osilator fisik.
+  \item \textbf{Verifikasi lanjutan} --- Pengujian DE10-Nano, karakterisasi PUF fisik (R1), uji \emph{replay} (R2), skenario basis data identitas (R3), dan pengujian \emph{glitch}/\emph{tamper} (R4) akan dilakukan setelah integrasi board. Statistik, latensi, dan sumber daya akan dilaporkan dari pengukuran aktual; belum ada hasil PUF fisik yang diklaim.
 \end{itemize}
 
 % =====================================================================
@@ -560,8 +572,8 @@ Penyerang fisik & Memanipulasi \emph{helper data} untuk membocorkan bit kunci & 
 
 \begin{itemize}
   \item Repositori proyek (RTL, testbench, model Python, dokumentasi): \todo{tautan GitHub, atur akses bila perlu dibagikan ke juri}.
-  \item Perangkat lunak: Intel Quartus Prime Lite (sintesis, timing, LogicLock, SignalTap), Platform Designer, Verilator, cocotb, Icarus Verilog, Yosys, dan Python, serta OpenROAD dengan SkyWater SKY130 PDK sebagai opsi.
-  \item Register map dan spesifikasi perintah \texttt{auth\_ctrl} akan dilengkapi pada laporan teknis.
+  \item Perangkat lunak: Intel Quartus Prime Standard (sintesis, timing, LogicLock, SignalTap), Platform Designer, Verilator, dan Python. Yosys/OpenROAD dengan SkyWater SKY130 PDK merupakan opsi untuk pengembangan ASIC.
+  \item Register map, termasuk register tag autentikasi dan status \emph{zeroize}, serta spesifikasi perintah akan dilengkapi pada laporan teknis.
 \end{itemize}
 
 \section*{Tim \& Pembagian Peran}
@@ -586,7 +598,7 @@ Pada DE10-Nano, dua ``baterai'' (dua lokasi PUF berbeda) diuji oleh dua stasiun 
 Video 3--5 menit: masalah baterai palsu, pembagian peran chip, stasiun, dan basis data, arsitektur chip, dan skenario serangan.
 
 \field{Repository Source Code:}
-RTL Verilog, testbench cocotb, model referensi Python, emulasi stasiun dan basis data, proyek Quartus/Platform Designer, skrip karakterisasi PUF, dan bitstream (.sof/.rbf).
+RTL SystemVerilog, testbench C++/Verilator, referensi Python, emulasi stasiun dan basis data, proyek Quartus/Platform Designer, skrip karakterisasi PUF, dan bitstream (.sof/.rbf) setelah validasi board.
 
 \field{Laporan Teknis Singkat:}
 Spesifikasi arsitektur dan register map, hasil sintesis/timing/resource/daya, statistik PUF (keunikan dan reliabilitas), latensi autentikasi, dan hasil uji serangan terhadap R1--R5.
