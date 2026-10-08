@@ -327,22 +327,22 @@ Chip ini memiliki satu fungsi inti, yaitu membuktikan identitas \emph{pack} bate
 \label{fig:arsitektur}
 \end{figure}
 
-Satu perintah \texttt{AUTH} melewati tiga jalur. Pada jalur perintah, host menulis \emph{nonce} dan \emph{helper data} ke \texttt{bus\_if}, lalu \texttt{auth\_ctrl} menjalankan urutan autentikasi. Pada jalur kunci, \texttt{ro\_puf} menghasilkan bit mentah dan \texttt{fuzzy\_ext} mengoreksinya dengan bantuan \emph{helper data}. Kunci kemudian diturunkan dengan SHA-256 dan disimpan sementara di \texttt{key\_vault}. Inti \texttt{hmac\_sha256} menggunakan kunci tersebut untuk menghitung respons, lalu \texttt{key\_vault} dikosongkan. Pada jalur pengaman, \texttt{tamper\_mon} memantau clock dan sakelar casing sepanjang waktu. Anomali pada keduanya membuat kunci dihapus dan FSM masuk \emph{lock}. Satu-satunya data rahasia yang keluar dari chip adalah respons 256-bit.
+Satu autentikasi berjalan sesuai nomor pada Gambar~\ref{fig:arsitektur}. Host mengirim \emph{nonce} dan \emph{helper data} melalui \texttt{bus\_if} (1). \texttt{ro\_puf} membaca sidik jari silikon (2), lalu \texttt{fuzzy\_ext} mengoreksi bitnya dengan bantuan \emph{helper data} dan menurunkan kunci ke \texttt{key\_vault} (3). \texttt{hmac\_sha256} menghitung respons dari kunci dan \emph{nonce} (4). Kunci kemudian dihapus dan respons dikirim ke host (5). Sepanjang waktu, \texttt{tamper\_mon} memantau clock dan casing. Bila ada gangguan, kunci langsung dihapus dan chip terkunci. Kunci tidak pernah keluar dari chip.
 
 \subsection{Data, Antarmuka, dan Memori}
 
 \begin{center}
 \small
 \renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.3cm}|>{\centering\arraybackslash}p{1.3cm}|>{\raggedright\arraybackslash}p{4.4cm}|X|}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.2cm}|>{\centering\arraybackslash}p{1.3cm}|>{\centering\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.1cm}|}
 \hline
-\hdr{Data} & \hdr{Ukuran} & \hdr{Lokasi} & \hdr{Masa hidup} \\ \hline
-Kunci $K$ & 256 bit & \texttt{key\_vault} (register volatil) & Selama satu autentikasi, tidak pernah keluar pada \emph{build} lapangan \\ \hline
-\emph{Helper data} & 512 bit & BMS dan basis data identitas & Permanen dan publik, dimuat ke chip setiap autentikasi \\ \hline
-ID & 64 bit & Diturunkan dari SHA-256(\emph{helper data}) & Dihitung ulang setiap autentikasi \\ \hline
-\emph{Nonce} & 256 bit & Diterbitkan basis data identitas & Sekali pakai \\ \hline
-Respons & 256 bit & Keluar ke stasiun & Sekali pakai \\ \hline
-Status \emph{lock} & 1 bit & Register volatil & Selama chip mendapat daya \\ \hline
+\hdr{Data} & \hdr{Ukuran} & \hdr{Rahasia} & \hdr{Tempat} & \hdr{Berlaku} \\ \hline
+Kunci & 256 bit & Ya & Register di dalam chip & Satu autentikasi \\ \hline
+\emph{Helper data} & 512 bit & Tidak & BMS dan basis data identitas & Tetap sejak enrolment \\ \hline
+ID & 64 bit & Tidak & Dihitung chip dari \emph{helper data} & Tetap \\ \hline
+\emph{Nonce} & 256 bit & Tidak & Dibuat basis data identitas & Sekali pakai \\ \hline
+Respons & 256 bit & Tidak & Dikirim ke basis data melalui stasiun & Sekali pakai \\ \hline
+Status \emph{lock} & 1 bit & Tidak & Register di dalam chip & Selama chip berdaya \\ \hline
 \end{tabularx}
 \end{center}
 
