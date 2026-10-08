@@ -207,21 +207,21 @@ Kebaruan usulan ini terletak pada pembagian peran yang tegas. Chip membuktikan i
 
 \subsection{Latar Belakang}
 
-Percepatan kendaraan bermotor listrik berbasis baterai diatur melalui Perpres No.~55 Tahun 2019 dan perubahannya, Perpres No.~79 Tahun 2023~\cite{perpres55,perpres79}. Jumlah kendaraan listrik roda dua kini lebih dari dua kali jumlah roda empat. Untuk segmen ini dikembangkan Stasiun Penukaran Baterai Kendaraan Listrik Umum (SPBKLU)~\cite{ruptl}. Pada model tukar baterai, pengendara tidak memiliki baterai. Baterai milik operator atau penyedia sewa, diisi di stasiun, lalu diserahkan kepada pengendara berikutnya. Badan usaha SPBKLU cukup memiliki NIB dan nomor identitas SPBKLU tanpa izin usaha penyediaan tenaga listrik~\cite{rukn}, sehingga jumlah operator dengan sistem yang berbeda terus bertambah. Akibatnya, baterai lebih banyak berada di tangan pengendara dan pihak lain daripada di bawah pengawasan pemiliknya.
+Percepatan kendaraan bermotor listrik berbasis baterai diatur melalui Perpres No.~55 Tahun 2019 dan perubahannya, Perpres No.~79 Tahun 2023~\cite{perpres55,perpres79}. Hingga Desember 2024, jumlah kendaraan listrik roda dua telah mencapai sekitar 168 ribu unit, lebih dari dua kali jumlah roda empat~\cite{ruptl}. Untuk segmen ini dikembangkan Stasiun Penukaran Baterai Kendaraan Listrik Umum (SPBKLU). Pada model tukar baterai, pengendara tidak memiliki baterai. Baterai milik operator atau penyedia sewa, diisi di stasiun, lalu diserahkan kepada pengendara berikutnya. Dengan demikian, baterai lebih banyak berada di tangan pengendara daripada di bawah pengawasan pemiliknya. Badan usaha SPBKLU cukup memiliki NIB dan nomor identitas SPBKLU tanpa izin usaha penyediaan tenaga listrik~\cite{rukn}, sehingga operator dengan sistem yang berbeda dapat terus bertambah. Di tingkat global, Regulasi Baterai Uni Eropa 2023/1542 mewajibkan paspor baterai digital, termasuk untuk baterai kendaraan ringan~\cite{eubat}. Identitas baterai yang dapat diverifikasi mulai menjadi kebutuhan yang diatur.
 
 \subsection{Tiga Masalah Inti}
 
-\begin{enumerate}[label=\textbf{P\arabic*.}, leftmargin=2.2em]
-  \item \textbf{Keaslian baterai tidak dapat dibuktikan.} Nomor seri, label, dan kode QR mudah disalin. Pihak yang mencari keuntungan dapat menukarkan baterai palsu atau bekas yang dirakit ulang tanpa standar dengan baterai asli di stasiun. Operator kehilangan aset bernilai jutaan rupiah, sedangkan pengendara berikutnya menerima baterai yang selnya berisiko mengalami \emph{thermal runaway}.
-  \item \textbf{Riwayat baterai bergantung pada pengakuan baterai itu sendiri.} Jumlah siklus dan kondisi kesehatan dilaporkan oleh BMS di dalam \emph{pack}, yang dapat diprogram ulang. Pihak yang memperjualbelikan baterai bekas dapat memutar mundur jumlah siklus agar baterai tua dihargai seperti baterai baru. Penilaian nilai sisa, klaim garansi, dan keputusan keselamatan pun didasarkan pada data yang salah.
-  \item \textbf{Kepercayaan tidak berlaku lintas operator.} Setiap operator mengelola identitas baterai dengan sistemnya sendiri. Tanpa basis data bersama yang netral, baterai dari satu jaringan tidak dapat diverifikasi di jaringan lain. Interoperabilitas membutuhkan standar identitas bersama. Chip ini dirancang untuk menjadi bagian dari standar tersebut.
-\end{enumerate}
+Baterai tukar berperilaku seperti dokumen berharga yang terus berpindah tangan. Keaslian dan riwayatnya harus dapat dibuktikan setiap kali berpindah, dengan pemeriksaan elektronik di setiap stasiun. Tiga masalah muncul dari kebutuhan tersebut.
 
-Ketiga masalah ini serupa dengan pemalsuan dokumen berharga, yaitu membuktikan bahwa sebuah benda asli dan riwayatnya tidak diubah. Bedanya, objeknya berupa aset fisik yang harus dapat diperiksa secara elektronik di setiap stasiun.
+\begin{enumerate}[label=\textbf{P\arabic*.}, leftmargin=2.2em]
+  \item \textbf{Keaslian baterai tidak dapat dibuktikan.} Nomor seri, label, dan kode QR mudah disalin. Pihak yang mencari keuntungan dapat menyerahkan baterai palsu di stasiun dan membawa pulang baterai asli. Operator kehilangan aset, sedangkan pengendara berikutnya menerima baterai dengan sel yang berisiko mengalami \emph{thermal runaway}.
+  \item \textbf{Riwayat baterai bergantung pada pengakuan baterai itu sendiri.} Jumlah siklus dan kondisi kesehatan dilaporkan oleh BMS di dalam \emph{pack}, yang dapat diprogram ulang sebelum baterai dijual kembali. Nilai sisa, klaim garansi, dan keputusan keselamatan pun didasarkan pada data yang salah. Riwayat yang benar juga tidak berguna apabila tidak terikat pada baterai fisik yang tepat.
+  \item \textbf{Kepercayaan tidak berlaku lintas operator.} Operator yang bersaing tidak akan mempercayai basis data milik pesaingnya. Akibatnya, baterai yang ditolak di satu jaringan tetap dapat beredar di jaringan lain. Pembeli baterai bekas, pihak daur ulang, dan penjamin garansi juga tidak memiliki sumber netral untuk memeriksa riwayatnya.
+\end{enumerate}
 
 \subsection{Alasan Diperlukannya Chip}
 
-Basis data saja tidak cukup, karena catatan yang benar dapat ditempelkan pada baterai palsu apabila baterai tidak memiliki identitas yang tidak dapat dipalsukan. Identitas itu juga tidak dapat diserahkan kepada perangkat lunak. Pihak yang ingin memalsukan baterai memegang perangkatnya langsung dengan waktu tidak terbatas, sehingga pemeriksaan berbasis perangkat lunak dapat dilewati dengan memprogram ulang firmware. Kunci rahasia yang tersimpan di memori flash juga dapat diekstrak melalui \emph{probing} atau injeksi kesalahan (\emph{fault injection})~\cite{barel}. Satu kunci yang bocor cukup untuk mengkloning ribuan baterai. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat. Kunci tidak boleh ada dalam bentuk tersimpan~\cite{suh,maes}, perhitungan kriptografi harus terisolasi dari firmware, dan chip harus mampu merespons serangan fisik tanpa bantuan perangkat lain.
+Identitas baterai tidak dapat diserahkan kepada perangkat lunak. Pihak yang ingin memalsukan baterai memegang perangkatnya langsung dengan waktu tidak terbatas, sehingga pemeriksaan berbasis perangkat lunak dapat dilewati dengan memprogram ulang firmware. Kunci rahasia yang tersimpan di memori flash dapat diekstrak melalui \emph{probing} atau injeksi kesalahan (\emph{fault injection})~\cite{barel}. Kunci dari satu baterai asli tersebut kemudian dapat disalin ke banyak baterai palsu yang memakai identitas yang sama. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat. Kunci tidak boleh tersimpan di dalam chip~\cite{suh,maes}, perhitungan kriptografi harus terisolasi dari firmware, dan chip harus mampu merespons serangan fisik tanpa bantuan perangkat lain. Chip asli yang dipindahkan ke \emph{pack} lain atau dikabelkan ke banyak \emph{pack} palsu tetap dapat menjawab tantangan. Serangan tersebut ditangkal di tingkat sistem dengan mencocokkan hasil ukur sel oleh stasiun terhadap riwayat identitasnya (Bagian~5).
 
 \subsection{Kesenjangan Solusi yang Tersedia}
 
@@ -230,17 +230,17 @@ Basis data saja tidak cukup, karena catatan yang benar dapat ditempelkan pada ba
 \renewcommand{\arraystretch}{1.15}
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|*{5}{>{\centering\arraybackslash}p{1.65cm}|}}
 \hline
-\hdr{Pendekatan} & \hdr{Tahan kloning} & \hdr{Tahan serangan fisik} & \hdr{Tanpa NVM} & \hdr{Lintas operator} & \hdr{Desain terbuka} \\ \hline
-Nomor seri, label, kode QR & \xmark & \xmark & \cmark & \pmark & \cmark \\ \hline
-Kunci di firmware BMS & \xmark & \xmark & \xmark & \xmark & \cmark \\ \hline
+\hdr{Pendekatan} & \hdr{Tahan kloning} & \hdr{Tahan serangan fisik} & \hdr{Kunci tidak tersimpan} & \hdr{Enrolment pihak netral} & \hdr{Dapat diaudit} \\ \hline
+Nomor seri, label, kode QR & \xmark & \xmark & -- & \pmark & \cmark \\ \hline
+Kunci di firmware BMS & \xmark & \xmark & \xmark & \xmark & \pmark \\ \hline
 IC autentikasi baterai komersial & \cmark & \cmark & \xmark & \pmark & \xmark \\ \hline
 \textbf{Usulan} & \cmark & \pmark & \cmark & \cmark & \cmark \\ \hline
 \end{tabularx}
 \end{center}
 \vspace{-8pt}
-{\footnotesize\color{subtle} \cmark{} terpenuhi \quad \pmark{} sebagian \quad \xmark{} tidak terpenuhi. Usulan dinilai ``sebagian'' pada serangan fisik karena proteksi \emph{side-channel} berada di luar cakupan prototipe (Bagian~5.3).\par}
+{\footnotesize\color{subtle} \cmark{} terpenuhi \quad \pmark{} sebagian \quad \xmark{} tidak terpenuhi \quad -- tidak relevan. Usulan dinilai ``sebagian'' pada serangan fisik karena proteksi \emph{side-channel} berada di luar cakupan prototipe (Bagian~5.3).\par}
 
-IC autentikasi komersial telah menyelesaikan masalah kloning. Namun, IC tersebut menyimpan kunci di memori non-volatil terlindungi, bersifat tertutup, dan bergantung pada rantai \emph{provisioning} vendor. Usulan ini mengisi celah tersebut dengan akar kepercayaan yang terbuka, tanpa kunci tersimpan, dan dapat diverifikasi lintas operator melalui basis data identitas yang netral.
+IC autentikasi baterai komersial tahan kloning dan serangan fisik. Namun, kuncinya ditanam ke memori chip melalui rantai \emph{provisioning} vendor, sehingga pihak netral tidak dapat melakukan enrolment atau mengaudit akar kepercayaannya secara mandiri. Pada usulan ini, kunci diturunkan dari PUF dan tidak pernah ditanam ke chip. Enrolment dapat dilakukan di bawah pengawasan lembaga penjamin keaslian. Desain chip juga dapat diperiksa karena dibangun dari baseline terbuka.
 
 \subsection{Rumusan Masalah dan Kebutuhan Desain}
 
@@ -252,10 +252,10 @@ Perancangan diarahkan untuk menjawab satu pertanyaan, yaitu bagaimana membangun 
 \begin{tabularx}{\linewidth}{|c|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.3cm}|}
 \hline
 \hdr{ID} & \hdr{Kebutuhan} & \hdr{Target} & \hdr{Metode pengukuran} \\ \hline
-R1 & Identitas tidak dapat dikloning & Kunci dari PUF dan tidak tersimpan. Kunci identik pada $\geq$1.000 regenerasi (suhu ruang), \emph{inter-distance} $\approx$50\% & Hash kunci tiap regenerasi dan jarak Hamming antar-lokasi RO \\ \hline
+R1 & Identitas tidak dapat dikloning & Kunci dari PUF dan tidak tersimpan. Kunci identik pada $\geq$1.000 regenerasi (suhu ruang), \emph{inter-distance} mendekati 50\% & Hash kunci tiap regenerasi dan jarak Hamming antar-lokasi RO \\ \hline
 R2 & Autentikasi yang segar & Respons lama selalu ditolak, waktu respons $<$50 ms & Uji \emph{replay} dan penghitungan siklus \\ \hline
 R3 & Riwayat yang tepercaya & Riwayat dicatat stasiun ke basis data identitas. Perubahan karakteristik yang janggal ditandai & Skenario demo dengan basis data emulasi \\ \hline
-R4 & Gagal dengan aman & \emph{Glitch} clock atau casing terbuka $\rightarrow$ kunci dihapus dan chip terkunci & Rekonfigurasi PLL dan pin \emph{tamper} di board \\ \hline
+R4 & Gagal dengan aman & \emph{Glitch} clock atau casing terbuka $\rightarrow$ register kunci sementara dikosongkan dan chip terkunci & Rekonfigurasi PLL dan pin \emph{tamper} di board \\ \hline
 R5 & Ringan dan siap ASIC & Tanpa NVM, tanpa DSP, $<$15\% ALM Cyclone~V & Sintesis Quartus dan Yosys \\ \hline
 \end{tabularx}
 \end{center}
@@ -365,7 +365,7 @@ DSP & 0 & 112 \\ \hline
 
 \textbf{Latensi.} Satu blok SHA-256 membutuhkan $\approx$65--70 siklus. Satu HMAC (4 kompresi) membutuhkan $\approx$280 siklus, atau $\approx$5,6\,$\mu$s pada 50~MHz. Waktu respons total didominasi regenerasi PUF (target $<$50 ms), jauh di bawah waktu penukaran baterai.
 
-\textbf{Daya dan target ASIC.} Chip mendapat daya terus-menerus dari sel baterai. Di luar autentikasi, hanya \texttt{tamper\_mon} yang aktif dengan clock lambat. Target konsumsi siaga ASIC $<$1 mW, sangat kecil dibanding \emph{self-discharge} pack. Target ASIC adalah SkyWater SKY130 (130 nm) dengan area $<$0,5 mm\textsuperscript{2}. Estimasi daya dan area diperoleh dari Quartus Power Analyzer untuk FPGA serta Yosys dan OpenROAD untuk SKY130.
+\textbf{Daya dan target ASIC.} Chip mendapat daya terus-menerus dari sel baterai. Di luar autentikasi, hanya \texttt{tamper\_mon} yang aktif dengan clock lambat. Target konsumsi siaga ASIC $<$1 mW, sangat kecil dibanding \emph{self-discharge} pack. Target ASIC adalah SkyWater SKY130 (130 nm) dengan area $<$0,5 mm\textsuperscript{2}. Daya dan area diestimasi dengan Quartus Power Analyzer, Yosys, dan OpenROAD.
 
 \subsection{Strategi Verifikasi}
 
@@ -408,8 +408,8 @@ Penyerang fisik & Memanipulasi \emph{helper data} untuk membocorkan bit kunci & 
 \subsection{Batasan dan Pengembangan Lanjutan}
 
 \begin{itemize}
-  \item Proteksi \emph{side-channel} (analisis daya~\cite{dpa}) dan uji suhu ekstrem berada di luar cakupan prototipe.
-  \item Pada prototipe FPGA, bitstream diasumsikan tepercaya. Isolasi kunci penuh, penanda \emph{tamper} permanen (OTP/eFuse), dan verifikasi luring berbasis ECC direncanakan untuk versi ASIC.
+  \item Proteksi \emph{side-channel} (analisis daya~\cite{dpa}), keandalan PUF pada rentang suhu \emph{pack}, dan penuaan jangka panjang berada di luar cakupan prototipe.
+  \item Pada prototipe FPGA, bitstream diasumsikan tepercaya. Isolasi kunci penuh, penanda \emph{tamper} permanen (OTP/eFuse), dan verifikasi luring berbasis ECC direncanakan pada versi ASIC.
   \item Bila PUF belum stabil, demo memakai kunci tetap yang disampaikan terbuka kepada juri.
 \end{itemize}
 
@@ -423,6 +423,7 @@ Penyerang fisik & Memanipulasi \emph{helper data} untuk membocorkan bit kunci & 
 \bibitem{perpres55} Peraturan Presiden RI No.~55 Tahun 2019 tentang Percepatan Program Kendaraan Bermotor Listrik Berbasis Baterai untuk Transportasi Jalan.
 \bibitem{perpres79} Peraturan Presiden RI No.~79 Tahun 2023 tentang Perubahan atas Perpres No.~55 Tahun 2019.
 \bibitem{rukn} Kementerian ESDM, \emph{Rencana Umum Ketenagalistrikan Nasional (RUKN)}, Kepmen ESDM No.~85.K/TL.01/MEM.L/2025, hlm.~51.
+\bibitem{eubat} Regulation (EU) 2023/1542 of the European Parliament and of the Council of 12 July 2023 concerning batteries and waste batteries.
 \bibitem{barel} H. Bar-El \emph{et al.}, ``The Sorcerer's Apprentice Guide to Fault Attacks,'' \emph{Proceedings of the IEEE}, vol.~94, no.~2, 2006.
 \bibitem{suh} G. E. Suh and S. Devadas, ``Physical Unclonable Functions for Device Authentication and Secret Key Generation,'' \emph{Proc. Design Automation Conference (DAC)}, 2007.
 \bibitem{maes} R. Maes, \emph{Physically Unclonable Functions: Constructions, Properties and Applications}, Springer, 2013.
