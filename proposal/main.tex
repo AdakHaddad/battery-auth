@@ -280,23 +280,23 @@ Chip ini memiliki satu fungsi inti, yaitu membuktikan identitas \emph{pack} bate
 \centering
 \begin{tikzpicture}[
   font=\sffamily\small,
-  blk/.style={draw, rounded corners=3pt, align=center, minimum height=1.0cm, minimum width=3.3cm, fill=white, line width=0.7pt},
+  blk/.style={draw, rounded corners=3pt, align=center, minimum height=1.05cm, minimum width=2.8cm, fill=white, line width=0.7pt},
   key/.style={blk, fill=secfill, draw=secline},
   mon/.style={blk, fill=badfill, draw=badline},
-  host/.style={blk, fill=okfill, draw=okline, minimum width=2.9cm, text width=2.7cm},
+  host/.style={blk, fill=okfill, draw=okline, minimum width=2.6cm, text width=2.4cm},
   arr/.style={-{Stealth[length=2.2mm]}, line width=0.7pt},
-  biarr/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, line width=0.7pt},
   zer/.style={-{Stealth[length=2.2mm]}, line width=0.8pt, draw=badline, dashed},
-  lbl/.style={font=\sffamily\scriptsize, align=center}
+  lbl/.style={font=\sffamily\scriptsize, align=center},
+  langkah/.style={circle, fill=secline, text=white, font=\sffamily\scriptsize\bfseries, inner sep=1pt, minimum size=3.6mm}
 ]
-  \node[blk] (bus)  at (0,0)    {\texttt{bus\_if}\\\footnotesize register mailbox};
-  \node[blk] (ctrl) at (4.25,0)  {\texttt{auth\_ctrl}\\\footnotesize FSM perintah};
-  \node[blk] (hmac) at (8.5,0)  {\texttt{hmac\_sha256}\\\footnotesize baseline TT07};
-  \node[mon] (tamp)  at (0,-2)   {\texttt{tamper\_mon}\\\footnotesize monitor clock $\cdot$ casing};
-  \node[key] (vault) at (8.5,-2) {\texttt{key\_vault}\\\footnotesize tanpa jalur baca};
-  \node[key] (puf) at (0,-4)   {\texttt{ro\_puf}\\\footnotesize 1.024 RO + pencacah};
-  \node[key] (fe)  at (4.25,-4) {\texttt{fuzzy\_ext}\\\footnotesize TMV + kode repetisi};
-  \node[host, minimum height=1.6cm] (hps) at (-4.05,0) {\textbf{Host}\\\footnotesize BMS / stasiun\\\footnotesize (AXI-Lite / I\textsuperscript{2}C)};
+  \node[blk] (bus)  at (0,0)     {\texttt{bus\_if}\\\footnotesize antarmuka host};
+  \node[blk] (ctrl) at (3.8,0)  {\texttt{auth\_ctrl}\\\footnotesize pengatur urutan};
+  \node[blk] (hmac) at (7.6,0)   {\texttt{hmac\_sha256}\\\footnotesize hitung respons};
+  \node[mon] (tamp)  at (0,-2)   {\texttt{tamper\_mon}\\\footnotesize deteksi gangguan};
+  \node[key] (vault) at (7.6,-2) {\texttt{key\_vault}\\\footnotesize kunci sementara};
+  \node[key] (puf) at (0,-4)     {\texttt{ro\_puf}\\\footnotesize baca sidik jari};
+  \node[key] (fe)  at (3.8,-4)  {\texttt{fuzzy\_ext}\\\footnotesize koreksi bit};
+  \node[host, minimum height=1.6cm] (hps) at (-4.9,0) {\textbf{Host}\\\footnotesize BMS / stasiun};
 
   \begin{scope}[on background layer]
     \node[draw=secline, line width=1pt, rounded corners=6pt, fill=secfill!35, inner sep=10pt,
@@ -304,17 +304,27 @@ Chip ini memiliki satu fungsi inti, yaitu membuktikan identitas \emph{pack} bate
           label={[font=\sffamily\small\bfseries, text=secline]above:Secure Battery Identity Chip}] (chip) {};
   \end{scope}
 
-  \draw[biarr] (hps) -- (bus);
-  \draw[biarr] (bus) -- (ctrl);
-  \draw[biarr] (ctrl) -- node[lbl, above]{pesan} (hmac);
+  % jalur perintah
+  \draw[arr] ([yshift=2.5mm]hps.east) -- node[lbl, above, pos=0.4]{\tikz[baseline=-0.6ex]\node[langkah]{1}; \emph{nonce}} ([yshift=2.5mm]bus.west);
+  \draw[arr] ([yshift=-2.5mm]bus.west) -- node[lbl, below, pos=0.6]{\tikz[baseline=-0.6ex]\node[langkah]{5}; respons} ([yshift=-2.5mm]hps.east);
+  \draw[arr] (bus) -- (ctrl);
+  \draw[arr] (ctrl) -- (hmac);
+  % jalur kunci
   \draw[arr] (puf) -- node[lbl, below]{bit\\mentah} (fe);
-  \draw[arr] (fe.east) -- (8.5,-4) -- node[lbl, right]{KDF} (vault.south);
-  \draw[arr] (vault) -- node[lbl, right]{kunci} (hmac);
-  \draw[zer] (tamp.east) -- node[lbl, below, text=badline, pos=0.7]{zeroize} (vault.west);
-  \draw[zer] (4.25,-2) -- node[lbl, right, text=badline]{lock} (ctrl.south);
-  \fill[badline] (4.25,-2) circle (1.6pt);
+  \draw[arr] (fe.east) -- (7.6,-4) -- node[lbl, right]{kunci} (vault.south);
+  \draw[arr] (vault) -- (hmac);
+  % jalur pengaman
+  \draw[zer] (tamp.east) -- node[lbl, below, text=badline, pos=0.75]{hapus kunci} (vault.west);
+  \draw[zer] (3.8,-2) -- node[lbl, right, text=badline]{kunci FSM} (ctrl.south);
+  \fill[badline] (3.8,-2) circle (1.6pt);
+
+  % urutan langkah
+  \node[langkah] at ([xshift=0.5mm, yshift=-0.5mm]puf.north west) {2};
+  \node[langkah] at ([xshift=0.5mm, yshift=-0.5mm]fe.north west) {3};
+  \node[langkah] at ([xshift=0.5mm, yshift=-0.5mm]hmac.north west) {4};
 \end{tikzpicture}
-\caption{Arsitektur chip. Blok biru membangkitkan dan menggunakan kunci. Register kunci tidak dapat dibaca melalui bus. Blok merah memantau serangan, menghapus kunci (\emph{zeroize}), dan mengunci FSM (\emph{lock}).}
+\caption{Arsitektur chip. Nomor menunjukkan urutan satu autentikasi.}
+\label{fig:arsitektur}
 \end{figure}
 
 Satu perintah \texttt{AUTH} melewati tiga jalur. Pada jalur perintah, host menulis \emph{nonce} dan \emph{helper data} ke \texttt{bus\_if}, lalu \texttt{auth\_ctrl} menjalankan urutan autentikasi. Pada jalur kunci, \texttt{ro\_puf} menghasilkan bit mentah dan \texttt{fuzzy\_ext} mengoreksinya dengan bantuan \emph{helper data}. Kunci kemudian diturunkan dengan SHA-256 dan disimpan sementara di \texttt{key\_vault}. Inti \texttt{hmac\_sha256} menggunakan kunci tersebut untuk menghitung respons, lalu \texttt{key\_vault} dikosongkan. Pada jalur pengaman, \texttt{tamper\_mon} memantau clock dan sakelar casing sepanjang waktu. Anomali pada keduanya membuat kunci dihapus dan FSM masuk \emph{lock}. Satu-satunya data rahasia yang keluar dari chip adalah respons 256-bit.
