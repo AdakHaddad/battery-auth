@@ -471,7 +471,8 @@ Penyerang fisik & Mengubah \emph{helper data} & Kunci menjadi salah sehingga res
 \section*{Lampiran Teknis}
 
 \begin{itemize}
-  \item Repositori proyek (RTL, testbench, model Python, dokumentasi): \todo{tautan GitHub, atur akses bila perlu dibagikan ke juri}.
+  \item Repositori proyek (RTL, testbench, model Python, dokumentasi): \url{https://github.com/Grsliy/Heketon-bang}.
+  \item Hasil awal model referensi Python (perangkat lunak, kunci tetap): lolos 2 vektor uji SHA-256 FIPS 180-4, 6 vektor uji HMAC-SHA-256 RFC 4231, dan 7 skenario protokol (baterai asli diterima, kloning, \emph{replay}, \emph{helper data} palsu, \emph{tamper}, dan kapasitas tidak wajar ditolak).
   \item Perangkat lunak: Intel Quartus Prime Lite (sintesis, timing, LogicLock, SignalTap), Platform Designer, Verilator, cocotb, Icarus Verilog, Yosys, dan Python, serta OpenROAD dengan SkyWater SKY130 PDK sebagai opsi.
   \item Register map dan spesifikasi perintah \texttt{auth\_ctrl} akan dilengkapi pada laporan teknis.
 \end{itemize}
