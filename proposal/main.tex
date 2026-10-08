@@ -165,7 +165,7 @@
 
 Setiap hari, pengendara motor listrik menukar baterai kosong dengan baterai penuh di stasiun penukaran baterai (SPBKLU). Baterai tersebut merupakan aset bersama yang berpindah dari satu pengendara ke pengendara lain dan dapat melewati beberapa operator dengan sistem yang berbeda. Saat menerima sebuah baterai, stasiun hanya dapat membaca data yang dilaporkan baterai itu sendiri sehingga keaslian dan catatan pemakaiannya tidak dapat dibuktikan. Baterai palsu atau bekas yang dirakit ulang tanpa standar dapat lolos ke jaringan dan berisiko memicu kebakaran. Jumlah siklus pemakaian juga dapat diubah agar baterai tua tampak baru, seperti odometer mobil bekas yang diputar mundur. Kedua celah ini makin luas seiring bertambahnya motor listrik, yang pada akhir 2024 telah mencapai sekitar 168 ribu unit~\cite{ruptl}.
 
-Kami mengusulkan Secure Battery Identity Chip, chip keamanan kecil yang ditanam di dalam setiap baterai. Kami merancang chip ini untuk membaca ``sidik jari'' alami dari variasi fabrikasi silikonnya dan menurunkan kunci dari sidik jari tersebut setiap kali dibutuhkan. Kunci tidak pernah disimpan di dalam chip, sehingga tidak ada kunci di memori chip yang dapat dibaca atau disalin. Saat baterai masuk, basis data identitas mengirim angka acak sekali pakai (\emph{nonce}) yang hanya dapat dijawab oleh chip asli (Gambar~\ref{fig:konsep}). Catatan pemakaian berasal dari pengukuran stasiun saat mengisi daya dan disimpan di basis data identitas yang dikelola lembaga penjamin keaslian. Jika chip mendeteksi pembongkaran atau gangguan listrik, chip berhenti menjawab dan basis data memblokir identitasnya secara permanen.
+Kami mengusulkan Secure Battery Identity Chip, chip keamanan kecil yang ditanam di dalam setiap baterai. Kami merancang chip ini untuk membaca ``sidik jari'' alami dari variasi fabrikasi silikonnya dan menurunkan kunci dari sidik jari tersebut setiap kali dibutuhkan. Kunci tidak pernah disimpan di dalam chip, sehingga tidak ada kunci di memori chip yang dapat dibaca atau disalin. Saat baterai masuk, basis data identitas mengirim angka acak sekali pakai (\emph{nonce}) yang hanya dapat dijawab oleh chip asli (Gambar~\ref{fig:konsep}). Catatan pemakaian berasal dari pengukuran stasiun saat mengisi daya dan disimpan di basis data identitas yang dikelola lembaga penjamin keaslian. Jika chip mendeteksi pembongkaran atau gangguan listrik, chip berhenti menjawab dan basis data memblokir identitasnya.
 
 \begin{figure}[H]
 \centering
@@ -198,14 +198,14 @@ Riwayat tersebut hanya bermakna apabila identitas baterai tidak dapat dipalsukan
 \renewcommand{\arraystretch}{1.12}
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.1cm}|X|}
 \hline
-\hdr{Chip yang dirancang} & \emph{Secure element} tanpa memori non-volatil berisi \emph{Ring-Oscillator PUF} dengan \emph{fuzzy extractor}, HMAC-SHA-256 berbasis baseline TT07, FSM \emph{challenge--response}, dan monitor \emph{tamper}. Target ASIC SKY130. \\ \hline
+\hdr{Chip yang dirancang} & \emph{Secure element} tanpa memori non-volatil untuk kunci dan data, berisi \emph{Ring-Oscillator PUF} dengan \emph{fuzzy extractor}, HMAC-SHA-256 berbasis baseline TT07, FSM \emph{challenge--response}, dan monitor \emph{tamper}. Target ASIC SKY130. \\ \hline
 \hdr{Target pengguna} & Operator stasiun dan penyedia sewa baterai (pemeriksa), produsen baterai dan BMS (pemasang chip), serta lembaga penjamin keaslian (pengelola basis data identitas). Adopsi dapat didorong melalui standar identitas baterai. \\ \hline
 \hdr{Dampak} & Baterai yang tidak dikenal ditolak sebelum diserahkan (keselamatan). Harga jual kembali dan garansi ditentukan dari riwayat yang tepercaya (ekonomi). Akar kepercayaan dirancang di dalam negeri (kemandirian). \\ \hline
 \hdr{Demo prototipe} & FPGA DE10-Nano. Baterai asli diterima, kloningan dan respons lama ditolak, serta pembongkaran membuat identitas diblokir. \\ \hline
 \end{tabularx}
 \end{center}
 
-Kebaruan usulan ini terletak pada pembagian peran yang tegas. Chip membuktikan identitas, stasiun mengukur, dan basis data mengingat. Dengan pembagian ini, chip tetap kecil, tanpa memori non-volatil, tanpa kunci tersimpan, dan dapat diverifikasi oleh operator mana pun.
+Kebaruan usulan ini terletak pada pembagian peran yang tegas. Chip membuktikan identitas, stasiun mengukur, dan basis data mengingat. Dengan pembagian ini, chip tetap kecil, tanpa memori non-volatil untuk kunci dan data, dan dapat diverifikasi oleh operator mana pun yang terhubung ke basis data identitas.
 
 
 % =====================================================================
@@ -349,7 +349,7 @@ Status \emph{lock} & 1 bit & Publik & Register di dalam chip & Selama chip berda
 \subsection{Alur Operasi}
 
 \begin{enumerate}
-  \item \textbf{Enrolment} --- dilakukan sekali di pabrik baterai di bawah pengawasan lembaga penjamin keaslian. Chip mengirim kuncinya dalam keadaan terenkripsi ke HSM, lalu basis data identitas mencatat kunci, \emph{helper data}, ID, dan karakteristik awal \emph{pack} baterai. Jalur pengiriman kunci ini hanya ada pada \emph{bitstream} pabrik. Pada ASIC, jalur tersebut ditutup permanen dengan eFuse setelah enrolment.
+  \item \textbf{Enrolment} --- dilakukan sekali di pabrik baterai di bawah pengawasan lembaga penjamin keaslian. Chip mengirim kuncinya ke HSM dalam keadaan terenkripsi dengan kunci publik HSM yang tertanam di \emph{bitstream} pabrik. Basis data identitas mencatat \emph{helper data}, ID, dan karakteristik awal \emph{pack} baterai. Jalur pengiriman kunci ini hanya ada pada \emph{bitstream} pabrik. Pada ASIC, jalur tersebut ditutup permanen dengan eFuse setelah enrolment.
   \item \textbf{Verifikasi} --- dilakukan pada setiap penukaran baterai. Stasiun meneruskan \emph{nonce} dari basis data identitas ke chip. Chip menjawab dengan respons HMAC$(K, \text{nonce}\,\|\,\text{ID})$. Basis data memeriksa respons tersebut bersama hasil ukur sel, memperbarui riwayat, lalu menjawab \emph{valid} atau \emph{tidak valid}. Stasiun tidak pernah memegang kunci.
 \end{enumerate}
 
@@ -369,7 +369,7 @@ Chip yang terkunci tetap mendapat daya dari sel, sehingga statusnya terbaca oleh
 \texttt{bus\_if} & Antarmuka ke host & Register AXI-Lite (FPGA) atau I\textsuperscript{2}C (ASIC). Kunci tidak dapat dibaca melalui bus. \\ \hline
 \texttt{auth\_ctrl} & Mengatur urutan perintah & FSM \texttt{GET\_ID}, \texttt{AUTH}, dan \texttt{STATUS}. Membatasi laju \texttt{AUTH} dan menolak perintah saat \emph{lock}. \\ \hline
 \texttt{ro\_puf} & Membaca sidik jari silikon & 1.024 \emph{ring oscillator} yang frekuensinya dibandingkan berpasangan. \\ \hline
-\texttt{fuzzy\_ext} & Membuat bit PUF stabil & \emph{Majority voting} dan kode repetisi untuk membuang bit yang berubah-ubah. \\ \hline
+\texttt{fuzzy\_ext} & Membuat bit PUF stabil & \emph{Majority voting} dan kode repetisi untuk membuang bit yang berubah-ubah. Bit stabil di-\emph{hash} SHA-256 menjadi kunci 256 bit (target entropi $\geq$128 bit). \\ \hline
 \texttt{key\_vault} & Menyimpan kunci sementara & Menyimpan kunci hanya selama respons dihitung, lalu menghapusnya. Isinya tidak dapat dibaca dari luar chip. \\ \hline
 \texttt{hmac\_sha256} & Menghitung respons dan menurunkan kunci & SHA-256 dari baseline TT07~\cite{tt07}, digunakan untuk HMAC dan penurunan kunci. \\ \hline
 \texttt{tamper\_mon} & Mendeteksi gangguan & Memantau clock dan sakelar casing, lalu memicu hapus kunci dan \emph{lock}. \\ \hline
@@ -397,7 +397,7 @@ DSP & 0 & 112 & 0\% \\ \hline
 
 \textbf{Kecepatan.} Satu perhitungan HMAC membutuhkan sekitar 280 siklus clock, atau 5,6\,$\mu$s pada 50~MHz. Bagian terlama adalah pembacaan ulang PUF, dengan target total respons di bawah 50~ms. Waktu ini jauh lebih singkat daripada proses penukaran baterai.
 
-\textbf{Daya dan versi ASIC.} Di luar autentikasi, hanya \texttt{tamper\_mon} yang aktif dengan clock lambat. Versi ASIC ditargetkan pada proses SkyWater SKY130 (130~nm) dengan area di bawah 0,5~mm\textsuperscript{2} dan daya siaga di bawah 1~mW, jauh lebih kecil daripada pengosongan alami baterai. Daya dan area diestimasi dengan Quartus Power Analyzer, Yosys, dan OpenROAD.
+\textbf{Daya dan versi ASIC.} Di luar autentikasi, hanya \texttt{tamper\_mon} yang aktif dengan clock lambat. Versi ASIC ditargetkan pada proses SkyWater SKY130 (130~nm) dengan area di bawah 0,5~mm\textsuperscript{2} dan daya siaga di bawah 1~mW, jauh lebih kecil daripada pengosongan alami baterai. Daya dan area akan diestimasi dengan Quartus Power Analyzer, Yosys, dan OpenROAD.
 
 \subsection{Strategi Verifikasi}
 
@@ -443,7 +443,7 @@ Penyerang fisik & Mengubah \emph{helper data} & Kunci menjadi salah sehingga res
 \begin{itemize}
   \item \textbf{Belum diuji pada prototipe.} Ketahanan terhadap serangan \emph{side-channel} (analisis konsumsi daya) serta kestabilan PUF terhadap suhu dan penuaan belum termasuk cakupan prototipe.
   \item \textbf{Ketergantungan pada HSM.} Kunci simetris membuat salinan kunci di HSM menjadi titik rawan tunggal. Versi ASIC direncanakan menggunakan tanda tangan ECC sehingga basis data cukup menyimpan kunci publik dan verifikasi dapat dilakukan tanpa koneksi.
-  \item \textbf{Keamanan \emph{bitstream}.} Pada prototipe, \emph{bitstream} FPGA diasumsikan tidak diubah pihak lain. Pada ASIC, risiko ini hilang karena rangkaian sudah tetap di silikon.
+  \item \textbf{Keamanan \emph{bitstream}.} Pada prototipe, \emph{bitstream} FPGA diasumsikan tidak diubah pihak lain. Status \emph{lock} juga hilang bila daya diputus sebelum terbaca stasiun. Versi ASIC direncanakan menyimpan status \emph{lock} pada satu bit eFuse.
   \item \textbf{Rencana cadangan demo.} Bila PUF belum stabil, demo menggunakan kunci tetap. Hal ini akan disampaikan terbuka kepada juri.
 \end{itemize}
 
