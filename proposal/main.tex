@@ -221,7 +221,7 @@ Baterai tukar berperilaku seperti dokumen berharga yang terus berpindah tangan. 
 
 \subsection{Alasan Diperlukannya Chip}
 
-Identitas baterai tidak dapat diserahkan kepada perangkat lunak. Pihak yang ingin memalsukan baterai memegang perangkatnya langsung dengan waktu tidak terbatas, sehingga pemeriksaan berbasis perangkat lunak dapat dilewati dengan memprogram ulang firmware. Kunci rahasia yang tersimpan di memori flash dapat diekstrak melalui \emph{probing} atau injeksi kesalahan (\emph{fault injection})~\cite{barel}. Kunci dari satu baterai asli tersebut kemudian dapat disalin ke banyak baterai palsu yang memakai identitas yang sama. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat. Kunci tidak boleh tersimpan di dalam chip~\cite{suh,maes}, perhitungan kriptografi harus terisolasi dari firmware, dan chip harus mampu merespons serangan fisik tanpa bantuan perangkat lain. Chip asli yang dipindahkan ke \emph{pack} lain atau dikabelkan ke banyak \emph{pack} palsu tetap dapat menjawab tantangan. Ruang gerak serangan tersebut dipersempit di tingkat sistem dengan mencocokkan hasil ukur sel oleh stasiun terhadap riwayat identitasnya, sehingga perubahan yang janggal dapat ditandai (Bagian~5).
+Identitas baterai tidak dapat diserahkan kepada perangkat lunak. Pihak yang ingin memalsukan baterai memegang perangkatnya langsung dengan waktu tidak terbatas, sehingga pemeriksaan berbasis perangkat lunak dapat dilewati dengan memprogram ulang firmware. Kunci rahasia yang tersimpan di memori flash dapat diekstrak melalui \emph{probing} atau injeksi kesalahan (\emph{fault injection})~\cite{barel}. Kunci dari satu baterai asli tersebut kemudian dapat disalin ke banyak baterai palsu yang menggunakan identitas yang sama. Karena itu, akar kepercayaan harus berada di silikon dengan tiga syarat. Kunci tidak boleh tersimpan di dalam chip~\cite{suh,maes}, perhitungan kriptografi harus terisolasi dari firmware, dan chip harus mampu merespons serangan fisik tanpa bantuan perangkat lain. Chip asli yang dipindahkan ke \emph{pack} lain atau dikabelkan ke banyak \emph{pack} palsu tetap dapat menjawab tantangan. Ruang gerak serangan tersebut dipersempit di tingkat sistem dengan mencocokkan hasil ukur sel oleh stasiun terhadap riwayat identitasnya, sehingga perubahan yang janggal dapat ditandai (Bagian~5).
 
 \subsection{Kesenjangan Solusi yang Tersedia}
 
@@ -250,30 +250,22 @@ Perancangan diarahkan untuk menjawab satu pertanyaan, yaitu bagaimana membangun 
 \begin{tabularx}{\linewidth}{|c|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.3cm}|}
 \hline
 \hdr{ID} & \hdr{Kebutuhan} & \hdr{Target} & \hdr{Metode pengukuran} \\ \hline
-R1 & Identitas tidak dapat dikloning & Kunci berasal dari PUF dan tidak disimpan di memori. Kunci sama pada $\geq$1.000 kali regenerasi di suhu ruang. \emph{Hamming distance} antar-lokasi mendekati 50\% & \emph{Hash} kunci tiap regenerasi dan \emph{Hamming distance} antar-lokasi RO \\ \hline
+R1 & Identitas tidak dapat dikloning & Kunci berasal dari PUF dan tidak disimpan di memori. Kunci sama pada $\geq$1.000 kali regenerasi di suhu ruang. \emph{Hamming distance} antar-lokasi mendekati 50\% & \emph{Hash} kunci tiap regenerasi dan \emph{Hamming distance} antar-lokasi RO dan antar-board \\ \hline
 R2 & Tahan \emph{replay} & Respons lama selalu ditolak. \emph{Latency} respons $<$50 ms & Uji \emph{replay} dan hitung \emph{clock cycle} \\ \hline
 R3 & Riwayat tepercaya & Riwayat dicatat stasiun ke basis data identitas. Perubahan karakteristik sel yang tidak wajar ditandai & Skenario demo dengan basis data emulasi \\ \hline
 R4 & \emph{Fail-secure} & \emph{Glitch} clock atau casing terbuka $\rightarrow$ register kunci di-\emph{zeroize} dan chip masuk \emph{lock} & Rekonfigurasi PLL dan pin \emph{tamper} di board \\ \hline
-R5 & Area kecil dan siap ASIC & Tanpa NVM, tanpa DSP, $<$15\% ALM Cyclone~V & Hasil sintesis Quartus dan Yosys \\ \hline
+R5 & Area kecil dan siap ASIC & Tanpa NVM untuk data, tanpa DSP, $<$15\% ALM Cyclone~V & Hasil sintesis Quartus dan Yosys \\ \hline
 \end{tabularx}
 \end{center}
 
 % =====================================================================
 \section{Proposed Chip}
 
-\subsection{Konsep Sistem dan Pembagian Peran}
+\subsection{Fungsi Utama}
 
-Sistem pada Gambar~\ref{fig:konsep} melibatkan tiga pihak dengan peran terpisah.
+Chip ini memiliki satu fungsi inti, yaitu membuktikan identitas \emph{pack} kepada stasiun tanpa menyimpan kunci. Setiap chip memiliki ``sidik jari'' alami dari variasi fabrikasi silikon yang dibaca ulang oleh \emph{Ring-Oscillator PUF} (RO-PUF) setiap kali dibutuhkan~\cite{suh}. Dari sidik jari tersebut chip menurunkan kunci, menjawab tantangan dari basis data identitas, lalu menghapus kunci.
 
-\begin{itemize}
-  \item \textbf{Chip di dalam \emph{pack}} --- membuktikan identitas melalui \emph{challenge--response}, tidak menyimpan kunci, dan berhenti menjawab saat mendeteksi serangan.
-  \item \textbf{Stasiun} --- membangkitkan \emph{nonce}, mengukur kondisi baterai (kapasitas dan resistansi dalam) saat mengisi, dan menolak baterai yang tidak lolos verifikasi.
-  \item \textbf{Basis data identitas} --- dikelola pihak tepercaya, menyimpan data enrolment di dalam modul keamanan (HSM), memverifikasi respons, dan mencatat riwayat setiap baterai dari hasil pengukuran stasiun.
-\end{itemize}
-
-Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS yang diprogram ulang (P2). Setiap identitas juga memiliki riwayat karakteristik sel, sehingga chip asli yang dipindahkan ke pack lain akan terlihat sebagai perubahan kapasitas atau resistansi yang janggal (Bagian~5).
-
-\subsection{Arsitektur Chip}
+\subsection{Arsitektur dan Alur Data}
 
 \begin{figure}[H]
 \centering
@@ -295,7 +287,7 @@ Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS ya
   \node[key] (vault) at (8.5,-2) {\texttt{key\_vault}\\\footnotesize tanpa jalur baca};
   \node[key] (puf) at (0,-4)   {\texttt{ro\_puf}\\\footnotesize 1.024 RO + pencacah};
   \node[key] (fe)  at (4.25,-4) {\texttt{fuzzy\_ext}\\\footnotesize TMV + kode repetisi};
-  \node[host, minimum height=1.6cm] (hps) at (-4.05,0) {\textbf{Host}\\\footnotesize BMS / stasiun\\\footnotesize (I\textsuperscript{2}C/SMBus)};
+  \node[host, minimum height=1.6cm] (hps) at (-4.05,0) {\textbf{Host}\\\footnotesize BMS / stasiun\\\footnotesize (AXI-Lite / I\textsuperscript{2}C)};
 
   \begin{scope}[on background layer]
     \node[draw=secline, line width=1pt, rounded corners=6pt, fill=secfill!35, inner sep=10pt,
@@ -313,15 +305,38 @@ Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS ya
   \draw[zer] (4.25,-2) -- node[lbl, right, text=badline]{lock} (ctrl.south);
   \fill[badline] (4.25,-2) circle (1.6pt);
 \end{tikzpicture}
-\caption{Arsitektur chip. Blok biru menangani kunci dan tidak memiliki jalur baca ke bus. Blok merah memantau serangan, menghapus kunci (\emph{zeroize}), dan mengunci FSM (\emph{lock}).}
+\caption{Arsitektur chip. Blok biru membangkitkan dan menggunakan kunci. Register kunci tidak dapat dibaca melalui bus. Blok merah memantau serangan, menghapus kunci (\emph{zeroize}), dan mengunci FSM (\emph{lock}).}
 \end{figure}
 
-\subsection{Protokol Enrolment dan Verifikasi}
+Satu perintah \texttt{AUTH} melewati tiga jalur. Pada jalur perintah, host menulis \emph{nonce} dan \emph{helper data} ke \texttt{bus\_if}, lalu \texttt{auth\_ctrl} menjalankan urutan autentikasi. Pada jalur kunci, \texttt{ro\_puf} menghasilkan bit mentah dan \texttt{fuzzy\_ext} mengoreksinya dengan bantuan \emph{helper data}. Kunci kemudian diturunkan dengan SHA-256 dan disimpan sementara di \texttt{key\_vault}. Inti \texttt{hmac\_sha256} menggunakan kunci tersebut untuk menghitung respons, lalu \texttt{key\_vault} dikosongkan. Pada jalur pengaman, \texttt{tamper\_mon} memantau clock dan sakelar casing sepanjang waktu. Anomali pada keduanya membuat kunci dihapus dan FSM masuk \emph{lock}. Satu-satunya data rahasia yang keluar dari chip adalah respons 256-bit.
+
+\subsection{Data, Antarmuka, dan Memori}
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.3cm}|>{\centering\arraybackslash}p{1.3cm}|>{\raggedright\arraybackslash}p{4.4cm}|X|}
+\hline
+\hdr{Data} & \hdr{Ukuran} & \hdr{Lokasi} & \hdr{Masa hidup} \\ \hline
+Kunci $K$ & 256 bit & \texttt{key\_vault} (register volatil) & Selama satu autentikasi, tidak pernah keluar pada \emph{build} lapangan \\ \hline
+\emph{Helper data} & 512 bit & BMS dan basis data identitas & Permanen dan publik, dimuat ke chip setiap autentikasi \\ \hline
+ID & 64 bit & Diturunkan dari SHA-256(\emph{helper data}) & Dihitung ulang setiap autentikasi \\ \hline
+\emph{Nonce} & 256 bit & Diterbitkan basis data identitas & Sekali pakai \\ \hline
+Respons & 256 bit & Keluar ke stasiun & Sekali pakai \\ \hline
+Status \emph{lock} & 1 bit & Register volatil & Selama chip mendapat daya \\ \hline
+\end{tabularx}
+\end{center}
+
+Chip tidak memiliki memori non-volatil untuk data. Antarmuka ke host berupa AXI-Lite pada prototipe FPGA dan I\textsuperscript{2}C/SMBus pada ASIC, ditambah satu input sakelar casing dan satu output penanda \emph{lock}.
+
+\subsection{Alur Operasi}
 
 \begin{enumerate}
-  \item \textbf{Enrolment} --- dilakukan sekali di pabrik baterai, dalam lingkungan tepercaya. Chip membangkitkan \emph{helper data} publik, lalu kunci turunannya diserahkan sekali ke HSM basis data identitas melalui mode enrolment. Setelah itu, logika chip menonaktifkan mode enrolment secara permanen. Basis data juga mencatat karakteristik awal \emph{pack}.
-  \item \textbf{Verifikasi} --- dilakukan pada setiap penukaran. Stasiun mengirim \emph{nonce} 256-bit. Chip membangkitkan ulang kunci, menghitung HMAC$(K, \text{nonce}\,\|\,\text{ID})$~\cite{fips198}, lalu langsung menghapus kunci. Stasiun meneruskan ID, \emph{nonce}, respons, dan hasil ukur ke basis data identitas, yang menjawab \emph{valid} atau \emph{tidak valid} sekaligus memperbarui riwayat. Stasiun tidak pernah memegang kunci chip mana pun.
+  \item \textbf{Enrolment} --- dilakukan sekali di pabrik baterai di bawah pengawasan lembaga penjamin keaslian. Pada prototipe, enrolment menggunakan \emph{bitstream} khusus pabrik yang mengirim kunci ke HSM dalam bentuk terbungkus kunci transport. \emph{Bitstream} lapangan sama sekali tidak memiliki jalur ekspor kunci. Pada ASIC, jalur ekspor ditutup dengan satu bit eFuse sekali-tulis. Basis data identitas mencatat kunci, \emph{helper data}, ID, dan karakteristik awal \emph{pack}.
+  \item \textbf{Verifikasi} --- dilakukan pada setiap penukaran. Basis data identitas menerbitkan \emph{nonce} 256-bit dan stasiun meneruskannya bersama \emph{helper data} ke chip. Chip membangkitkan ulang kunci, menghitung HMAC$(K, \text{nonce}\,\|\,\text{ID})$~\cite{fips198}, lalu langsung menghapus kunci. Stasiun mengirim respons dan hasil ukur sel ke basis data identitas, yang memeriksa respons, memperbarui riwayat, dan menjawab \emph{valid} atau \emph{tidak valid}. Stasiun tidak pernah memegang kunci chip mana pun.
 \end{enumerate}
+
+Status chip berurutan dari BOOT ke IDLE, lalu AUTH, lalu kembali ke IDLE. Saat \texttt{tamper\_mon} mendeteksi anomali, chip berpindah ke LOCK dari status mana pun. Status LOCK bersifat volatil, tetapi chip terus mendapat daya dari sel sehingga stasiun berikutnya membacanya dan basis data memblokir ID tersebut.
 
 % =====================================================================
 \section{Technical Design}
@@ -329,37 +344,24 @@ Riwayat yang dibangun dari pengukuran stasiun tidak dapat dipalsukan oleh BMS ya
 \subsection{Rincian Modul RTL}
 
 \begin{center}
-\small
+\footnotesize
 \renewcommand{\arraystretch}{1.15}
 \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.6cm}|X|}
 \hline
 \hdr{Modul} & \hdr{Fungsi dan pendekatan RTL} \\ \hline
-\texttt{bus\_if} & Register \emph{mailbox} (CMD, STATUS, NONCE[256], RESP[256], ID, HELPER). Menggunakan AXI-Lite pada prototipe FPGA dan I\textsuperscript{2}C/SMBus pada ASIC. \\ \hline
-\texttt{auth\_ctrl} & FSM perintah \texttt{GET\_ID}, \texttt{AUTH(nonce)}, dan \texttt{STATUS}. Mode \texttt{ENROLL} hanya aktif sekali. Semua perintah ditolak saat \emph{lock}. \\ \hline
-\texttt{hmac\_sha256} & Inti SHA-256 iteratif~\cite{fips180} dari baseline TT07 (1 ronde/siklus) dengan \emph{wrapper} HMAC (ipad/opad). \\ \hline
+\texttt{auth\_ctrl} & FSM perintah \texttt{GET\_ID}, \texttt{AUTH(nonce)}, dan \texttt{STATUS} dengan pembatas laju \texttt{AUTH}. Perintah \texttt{ENROLL} hanya ada pada \emph{bitstream} pabrik. Semua perintah ditolak saat \emph{lock}. \\ \hline
+\texttt{hmac\_sha256} & Inti SHA-256 iteratif~\cite{fips180} dari baseline TT07 (1 ronde/siklus) dengan \emph{wrapper} HMAC (ipad/opad). Inti yang sama juga menurunkan kunci (KDF). \\ \hline
 \texttt{ro\_puf} & 1.024 \emph{ring oscillator} (512 pasangan pembanding) dengan 16 pencacah paralel. Penempatan dikunci dengan LogicLock agar simetris. \\ \hline
-\texttt{fuzzy\_ext} & \emph{Temporal majority voting} dan kode repetisi ($n=3$) dengan \emph{helper data} publik~\cite{dodis}, mengubah 512 bit mentah menjadi 170 bit stabil. Kunci $K=$ SHA-256(bit stabil $\|$ \emph{helper data}), sehingga \emph{helper data} yang dimanipulasi selalu menghasilkan kunci salah. \\ \hline
-\texttt{key\_vault} & Register kunci tanpa jalur baca. Kunci hanya ada selama satu autentikasi (orde milidetik), lalu dihapus. \\ \hline
+\texttt{fuzzy\_ext} & \emph{Temporal majority voting} dan kode repetisi dengan \emph{helper data} publik~\cite{dodis}. Jumlah pembacaan dan panjang kode ditetapkan dari \emph{bit error rate} yang diukur pada prototipe. Kunci $K=$ SHA-256(bit stabil $\|$ \emph{helper data}), sehingga \emph{helper data} yang dimanipulasi selalu menghasilkan kunci salah. \\ \hline
 \texttt{tamper\_mon} & Monitor frekuensi clock terhadap osilator internal dan pin sakelar casing yang memicu \emph{zeroize} dan \emph{lock}. Sensor \emph{canary} timing untuk \emph{glitch} tegangan bersifat eksploratif. \\ \hline
 \end{tabularx}
 \end{center}
 
 \subsection{Implementasi, Sumber Daya, dan Daya}
 
-\textbf{Prototipe FPGA.} Chip dijalankan pada \emph{fabric} Cyclone~V di DE10-Nano~\cite{de10}. Prosesor ARM (HPS) pada board yang sama menjalankan emulasi BMS, stasiun, dan basis data identitas dalam Python, yang terhubung ke chip melalui \emph{Lightweight HPS-to-FPGA bridge}. Antarmuka yang sederhana dan tanpa NVM juga memungkinkan IP ini diintegrasikan sebagai blok tambahan pada baseline chip penyelenggara~\cite{peruri}.
+\textbf{Prototipe FPGA.} Chip dijalankan pada \emph{fabric} Cyclone~V di DE10-Nano~\cite{de10}. Prosesor ARM (HPS) pada board yang sama menjalankan emulasi BMS, stasiun, dan basis data identitas dalam Python melalui \emph{Lightweight HPS-to-FPGA bridge}. Antarmuka yang sederhana dan tanpa NVM juga memungkinkan IP ini diintegrasikan sebagai blok tambahan pada baseline chip penyelenggara~\cite{peruri}.
 
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\linewidth}{|X|X|X|}
-\hline
-\hdr{Sumber daya} & \hdr{Estimasi awal} & \hdr{Kapasitas DE10-Nano} \\ \hline
-Logic (ALM) & $\approx$4.000--6.000 ($<$15\%) & 41.910 ALM \\ \hline
-Register (FF) & $\approx$3.000--5.000 & 166.036 \\ \hline
-Block RAM (M10K) & 0--2 blok & 5.570 Kbit \\ \hline
-DSP & 0 & 112 \\ \hline
-\end{tabularx}
-\end{center}
+\textbf{Sumber daya.} Estimasi awal pada Cyclone~V adalah $\approx$4.000--6.000 ALM ($<$15\% dari 41.910 ALM), $\approx$3.000--5.000 register, 0--2 blok M10K, dan tanpa DSP. Angka final diperoleh dari hasil sintesis.
 
 \textbf{Latensi.} Satu blok SHA-256 membutuhkan $\approx$65--70 siklus. Satu HMAC (4 kompresi) membutuhkan $\approx$280 siklus, atau $\approx$5,6\,$\mu$s pada 50~MHz. Waktu respons total didominasi regenerasi PUF (target $<$50 ms), jauh di bawah waktu penukaran baterai.
 
@@ -369,7 +371,8 @@ DSP & 0 & 112 \\ \hline
 
 \begin{itemize}
   \item \textbf{Simulasi dengan cocotb dan Verilator} --- SHA-256 dan HMAC dibandingkan bit per bit dengan model Python menggunakan vektor uji FIPS 180-4 dan RFC 4231~\cite{rfc4231}. FSM diuji untuk semua perintah, \emph{nonce} berulang, dan perilaku \emph{lock}. \emph{Fuzzy extractor} diuji dengan injeksi derau bit, sedangkan \emph{fault injection} memastikan chip berakhir dalam keadaan aman.
-  \item \textbf{Pengujian di board} --- mencakup \emph{timing closure}, karakterisasi PUF (R1) pada beberapa lokasi penempatan RO, uji \emph{replay} (R2), skenario basis data identitas (R3), serta \emph{glitch} clock melalui rekonfigurasi PLL dan pin \emph{tamper} (R4). SignalTap hanya digunakan pada \emph{build} pengembangan.
+  \item \textbf{Prototipe awal} --- sebelum bootcamp, RTL yang sama diuji pada FPGA Xilinx milik tim (Artix-7 dan Spartan-7) dengan PC sebagai stasiun dan basis data melalui UART, termasuk keunikan PUF antar-board.
+  \item \textbf{Pengujian di DE10-Nano} --- mencakup \emph{timing closure}, karakterisasi PUF (R1) pada beberapa lokasi penempatan RO, uji \emph{replay} (R2), skenario basis data identitas (R3), serta \emph{glitch} clock melalui rekonfigurasi PLL dan pin \emph{tamper} (R4).
 \end{itemize}
 
 % =====================================================================
@@ -378,37 +381,37 @@ DSP & 0 & 112 \\ \hline
 \subsection{Model Ancaman}
 
 \begin{center}
-\small
+\footnotesize
 \renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{3.0cm}|X|>{\raggedright\arraybackslash}p{5.2cm}|}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{2.5cm}|X|>{\raggedright\arraybackslash}p{6.1cm}|}
 \hline
 \hdr{Penyerang} & \hdr{Serangan} & \hdr{Penangkal} \\ \hline
 Pemalsu baterai & Menyalin rangkaian atau firmware chip asli & Kunci dari PUF dan tidak tersimpan (R1) \\ \hline
-Pemalsu baterai & Memindahkan chip asli ke pack berisi sel tak standar & Karakteristik sel dicocokkan dengan riwayat ID (R3) \\ \hline
-Penyadap komunikasi & Merekam lalu mengirim ulang respons (\emph{replay}) & \emph{Nonce} acak per penukaran (R2) \\ \hline
-Operator atau bengkel nakal & Memprogram ulang BMS untuk me-\emph{reset} jumlah siklus & Riwayat diambil dari pengukuran stasiun (R3) \\ \hline
-Stasiun palsu atau curang & Mengirim hasil ukur palsu ke basis data & Stasiun diautentikasi. Hasil ukur dicocokkan antarstasiun (R3) \\ \hline
+Pemalsu baterai & Memindahkan chip asli ke \emph{pack} palsu & Sel dicocokkan dengan riwayat ID (R3) \\ \hline
+Penyadap & Mengirim ulang respons lama (\emph{replay}) & \emph{Nonce} sekali pakai (R2) \\ \hline
+Bengkel nakal & Me-\emph{reset} jumlah siklus di BMS & Riwayat dari pengukuran stasiun (R3) \\ \hline
+Stasiun curang & Mengirim hasil ukur palsu & \emph{Nonce} dari basis data, hasil ukur dicocokkan (R3) \\ \hline
 Penyerang fisik & \emph{Glitch} clock atau membongkar casing & \texttt{tamper\_mon} memicu \emph{zeroize} dan \emph{lock} (R4) \\ \hline
-Penyerang fisik & Mematikan daya untuk membuka \emph{lock} & Basis data memblokir permanen ID yang melapor terkunci \\ \hline
-Penyerang fisik & Memanipulasi \emph{helper data} untuk membocorkan bit kunci & \emph{Helper data} ikut masuk KDF sehingga perubahan menghasilkan kunci salah \\ \hline
+Penyerang fisik & Mematikan daya untuk membuka \emph{lock} & Basis data memblokir ID yang melapor terkunci \\ \hline
+Penyerang fisik & Mengirim \texttt{ENROLL} untuk mengekspor kunci & \emph{Bitstream} lapangan tanpa jalur ekspor, eFuse (ASIC) \\ \hline
+Penyerang fisik & Memanipulasi \emph{helper data} & \emph{Helper data} masuk KDF sehingga kunci menjadi salah \\ \hline
 \end{tabularx}
 \end{center}
 
 \subsection{Prinsip \emph{Security-by-Design}}
 
 \begin{itemize}
-  \item \textbf{Tidak ada rahasia yang tersimpan di perangkat lapangan.} Kunci hanya ada di dalam chip selama satu autentikasi. Satu-satunya salinan berada di HSM milik pihak tepercaya.
-  \item \textbf{Tidak ada jalur baca ke kunci.} Register kunci tidak terhubung ke bus. Mode enrolment hanya dapat dijalankan sekali.
-  \item \textbf{Gagal dengan aman.} Setiap anomali pada clock, casing, atau perintah berakhir pada kunci terhapus dan chip terkunci, tanpa respons yang membocorkan kunci.
-  \item \textbf{Keputusan diambil pihak tepercaya.} Chip tidak memutuskan apa pun. Basis data menerima atau menolak baterai berdasarkan riwayatnya.
+  \item \textbf{Tidak ada rahasia di perangkat lapangan.} Kunci hanya ada di dalam chip selama satu autentikasi. Satu-satunya salinan berada di HSM milik pihak tepercaya.
+  \item \textbf{Gagal dengan aman.} Setiap anomali berakhir pada kunci terhapus dan chip terkunci.
+  \item \textbf{Keputusan di pihak tepercaya.} Basis data menerima atau menolak baterai sesuai riwayatnya.
 \end{itemize}
 
 \subsection{Batasan dan Pengembangan Lanjutan}
 
 \begin{itemize}
-  \item Proteksi \emph{side-channel} (analisis daya~\cite{dpa}), keandalan PUF pada rentang suhu \emph{pack}, dan penuaan jangka panjang berada di luar cakupan prototipe.
-  \item Pada prototipe FPGA, bitstream diasumsikan tepercaya. Isolasi kunci penuh, penanda \emph{tamper} permanen (OTP/eFuse), dan verifikasi luring berbasis ECC direncanakan pada versi ASIC.
-  \item Bila PUF belum stabil, demo memakai kunci tetap yang disampaikan terbuka kepada juri.
+  \item Proteksi \emph{side-channel}~\cite{dpa}, keandalan PUF pada rentang suhu \emph{pack}, dan penuaan di luar cakupan prototipe.
+  \item Pada prototipe, \emph{bitstream} diasumsikan tepercaya. Versi ASIC direncanakan memiliki eFuse dan tanda tangan ECC untuk verifikasi luring, yang juga mengurangi ketergantungan pada HSM.
+  \item Bila PUF belum stabil, demo menggunakan kunci tetap yang disampaikan terbuka kepada juri.
 \end{itemize}
 
 % =====================================================================
@@ -460,7 +463,7 @@ Muhammad Muqtada Alhaddad & RTL Designer / Verilog & Integrasi SHA-256 TT07 dan 
 \section*{Luaran \& Demo (Opsional)}
 
 \field{Demo Live:}
-Pada DE10-Nano, dua ``baterai'' (dua lokasi PUF berbeda) diuji oleh dua stasiun emulasi yang memakai satu basis data. Baterai asli diterima di kedua stasiun, kloningan ditolak, respons lama (\emph{replay}) ditolak, dan \emph{glitch} clock atau pembukaan ``casing'' membuat chip terkunci dengan indikator LED, lalu ID-nya diblokir basis data.
+Pada DE10-Nano, dua ``baterai'' (dua lokasi PUF berbeda) diuji oleh dua stasiun emulasi yang terhubung ke satu basis data. Baterai asli diterima di kedua stasiun, kloningan ditolak, respons lama (\emph{replay}) ditolak, dan \emph{glitch} clock atau pembukaan ``casing'' membuat chip terkunci dengan indikator LED, lalu ID-nya diblokir basis data.
 
 \field{Video Demo:}
 Video 3--5 menit: masalah baterai palsu, pembagian peran chip, stasiun, dan basis data, arsitektur chip, dan skenario serangan.
