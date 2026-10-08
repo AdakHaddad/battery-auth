@@ -250,11 +250,11 @@ Perancangan diarahkan untuk menjawab satu pertanyaan, yaitu bagaimana membangun 
 \begin{tabularx}{\linewidth}{|c|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.3cm}|}
 \hline
 \hdr{ID} & \hdr{Kebutuhan} & \hdr{Target} & \hdr{Metode pengukuran} \\ \hline
-R1 & Identitas tidak dapat dikloning & Kunci dari PUF dan tidak tersimpan. Kunci identik pada $\geq$1.000 regenerasi (suhu ruang), \emph{inter-distance} mendekati 50\% & Hash kunci tiap regenerasi dan jarak Hamming antar-lokasi RO \\ \hline
-R2 & Autentikasi yang segar & Respons lama selalu ditolak, waktu respons $<$50 ms & Uji \emph{replay} dan penghitungan siklus \\ \hline
-R3 & Riwayat yang tepercaya & Riwayat dicatat stasiun ke basis data identitas. Perubahan karakteristik yang janggal ditandai & Skenario demo dengan basis data emulasi \\ \hline
-R4 & Gagal dengan aman & \emph{Glitch} clock atau casing terbuka $\rightarrow$ register kunci sementara dikosongkan dan chip terkunci & Rekonfigurasi PLL dan pin \emph{tamper} di board \\ \hline
-R5 & Ringan dan siap ASIC & Tanpa NVM, tanpa DSP, $<$15\% ALM Cyclone~V & Sintesis Quartus dan Yosys \\ \hline
+R1 & Identitas tidak dapat dikloning & Kunci berasal dari PUF dan tidak disimpan di memori. Kunci sama pada $\geq$1.000 kali regenerasi di suhu ruang. \emph{Hamming distance} antar-lokasi mendekati 50\% & \emph{Hash} kunci tiap regenerasi dan \emph{Hamming distance} antar-lokasi RO \\ \hline
+R2 & Tahan \emph{replay} & Respons lama selalu ditolak. \emph{Latency} respons $<$50 ms & Uji \emph{replay} dan hitung \emph{clock cycle} \\ \hline
+R3 & Riwayat tepercaya & Riwayat dicatat stasiun ke basis data identitas. Perubahan karakteristik sel yang tidak wajar ditandai & Skenario demo dengan basis data emulasi \\ \hline
+R4 & \emph{Fail-secure} & \emph{Glitch} clock atau casing terbuka $\rightarrow$ register kunci di-\emph{zeroize} dan chip masuk \emph{lock} & Rekonfigurasi PLL dan pin \emph{tamper} di board \\ \hline
+R5 & Area kecil dan siap ASIC & Tanpa NVM, tanpa DSP, $<$15\% ALM Cyclone~V & Hasil sintesis Quartus dan Yosys \\ \hline
 \end{tabularx}
 \end{center}
 
